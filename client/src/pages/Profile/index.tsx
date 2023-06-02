@@ -1,8 +1,11 @@
+import { PageTitle } from "../../lib/styled-component/styles"
 
 const index = () => {
   return (
     <div>
-      <h1>Profile</h1>
+      <PageTitle>
+        <h1>Explore</h1>
+      </PageTitle>
     </div>
   )
 }

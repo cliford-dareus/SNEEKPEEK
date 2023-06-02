@@ -41,7 +41,7 @@ const index = () => {
 
       <SideContentContainer>
         <SideContentActivity>
-          <h3>Activities</h3>
+          <h2>Activities</h2>
 
           <SideActivity>
             <Flex>
@@ -92,7 +92,7 @@ const index = () => {
         </SideContentActivity>
 
         <SideGroupContainer>
-          <h3>Groups</h3>
+          <h2>Groups</h2>
         </SideGroupContainer>
       </SideContentContainer>
     </SidebarContainer>
@@ -164,8 +164,8 @@ const SideContentActivity = styled.div`
 `;
 
 const SideContentSubTitle = styled.span`
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-size: 1rem;
+  font-weight: bold;
   margin-right: auto;
 `;
 

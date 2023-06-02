@@ -6,7 +6,7 @@ const index = () => {
   return (
     <SideContentContainer>
       <div>
-        <div>
+        <SideContentTop>
           <SideContentMenu>
             <li>
               <SideContntBtn to="." data-active="true">
@@ -24,7 +24,7 @@ const index = () => {
           <div>
             <Outlet />
           </div>
-        </div>
+        </SideContentTop>
 
         <div>
           <h3>Friends</h3>
@@ -38,10 +38,14 @@ export default index;
 
 const SideContentContainer = styled.aside`
   width: 285px;
-  background-color: var(--dark--color-800);
+  /* background-color: var(--dark--color-800); */
   height: 100%;
   border-radius: 10px;
+`;
+
+const SideContentTop = styled.div`
   padding: 1em;
+  background-color: var(--dark--color-800);
 `;
 
 const SideContentMenu = styled.ul`
