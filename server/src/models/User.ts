@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import mongoose, { Schema } from "mongoose";
 import validator from "validator";
-import { IUser, IUserMethod, IUserModel } from "../types/models.type";
+import { IUser, IUserMethod, UserModel } from "../types/models.type";
 
-const UserSchema = new Schema<IUser, IUserModel, IUserMethod>(
+const UserSchema = new Schema<IUser, UserModel, IUserMethod>(
   {
     name: {
       type: String,
@@ -15,6 +15,7 @@ const UserSchema = new Schema<IUser, IUserModel, IUserMethod>(
     username: {
       type: String,
       require: true,
+      unique: true,
       min: 4,
       max: 20,
       trim: true,
@@ -45,4 +46,4 @@ UserSchema.methods.comparePassword = async function (password: string) {
   return isMatch;
 };
 
-export const User = mongoose.model<IUser>("User", UserSchema);
+export const User = mongoose.model<IUser, UserModel>("User", UserSchema);

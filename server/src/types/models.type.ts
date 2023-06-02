@@ -1,24 +1,41 @@
-import { Document, Model } from "mongoose";
+import { Response } from "express";
+import { Model, ObjectId } from "mongoose";
 
-export interface IUser extends Document {
+export interface IUser {
+  _id: ObjectId;
   name: string;
   username: string;
   password: string;
   email: string;
 }
 
-export interface IToken extends Document {
+export interface IToken {
   userId: string;
   refreshToken: string;
   expirationTime: Date;
+  isValid: boolean;
 }
 
 export interface IUserMethod {
-  comparedPassword: (password: string) => boolean;
+  comparePassword: (password: string) => Promise<boolean>;
 }
 
-export type IUserModel = Model<IUser, unknown, IUserMethod>;
+export type UserModel = Model<IUser, unknown, IUserMethod>;
 
+export type UserToken = {
+  username: string;
+  userId: ObjectId;
+};
+
+export interface IUserTokenPayLoad {
+  res: Response;
+  user: UserToken;
+  refreshToken: string;
+}
+
+export interface ICreateJwtPayLoad {
+  payload: { user: UserToken; refreshToken?: string };
+}
 // export interface ISignUpPayload {
 //   name:
 // }

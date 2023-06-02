@@ -11,6 +11,10 @@ const TokenSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    isValid: {
+      type: Boolean,
+      default: true,
+    },
     expirationTime: {
       type: String,
     },
