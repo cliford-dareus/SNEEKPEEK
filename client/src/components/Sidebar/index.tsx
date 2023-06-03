@@ -56,7 +56,7 @@ const index = () => {
                 style={{
                   padding: ".5em 1em",
                   backgroundColor: "var(--primary--color-400)",
-                  borderRadius: '10px'
+                  borderRadius: "10px",
                 }}
               >
                 Lorem, ipsum.
@@ -91,9 +91,7 @@ const index = () => {
           </SideNewActivity>
         </SideContentActivity>
 
-        <SideGroupContainer>
-          <h2>Groups</h2>
-        </SideGroupContainer>
+        <SideGroupContainer>{/* <h2>Groups</h2> */}</SideGroupContainer>
       </SideContentContainer>
     </SidebarContainer>
   );
@@ -109,14 +107,21 @@ const Icon = styled.span`
 `;
 
 const SidebarContainer = styled.aside`
-  width: 285px;
-  height: 100%;
-  background-color: var(--dark--color-800);
-  border-radius: 10px;
-  overflow: hidden;
-  display: flex;
+  display: none;
 
-  /* width: 49px */
+  @media screen and (min-width: 635px) {
+    width: 49px;
+    height: 45%;
+    background-color: var(--dark--color-800);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+  }
+
+  @media screen and (min-width: 1035px) {
+    width: 300px;
+    height: 45%;
+  }
 `;
 
 const Navigation = styled.nav`
@@ -124,8 +129,10 @@ const Navigation = styled.nav`
   height: 100%;
   border-right: 1px solid white;
 
-
   /* flex-shrink: 0; */
+  @media screen and (min-width: 635px) {
+    flex-shrink: 0;
+  }
 `;
 
 const NavigationList = styled.ul`
@@ -160,7 +167,7 @@ const SideContentContainer = styled.div`
 
 const SideContentActivity = styled.div`
   width: 100%;
-  border-bottom: 1px solid;
+  /* border-bottom: 1px solid; */
 `;
 
 const SideContentSubTitle = styled.span`
@@ -171,7 +178,7 @@ const SideContentSubTitle = styled.span`
 
 //Activty
 const SideActivity = styled.div`
-  margin-top: 0.5em;
+  margin-top: 1em;
 `;
 
 //New Activity

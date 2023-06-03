@@ -4,8 +4,15 @@ export const Flex = styled.div`
     display: flex;
 `;
 
+export const FlexCol = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
 export const PageContainer = styled.div`
     flex: 1;
+    flex-shrink: 0;
+    min-width: 400px;
     height: calc(100vh - 60px - 1em);
     overflow-y: scroll;
     position: relative;

@@ -53,18 +53,29 @@ const Header = styled.header`
   height: 60px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 `;
 
 const HeaderInputContainer = styled.div`
-  width: 30%;
-  height: 40px;
-  border-radius: 10px;
-  margin-left: 16.5em;
-  margin-right: auto;
-  padding-inline: 1em;
-  display: flex;
-  align-items: center;
-  background-color: var(--dark--color-800);
+  display: none;
+
+  @media screen and (min-width: 635px) {
+    width: 30%;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    background-color: var(--dark--color-800);
+    margin-right: auto;
+    padding-inline: 1em;
+    margin-left: 1.7em;
+  }
+
+  @media screen and (min-width: 1035px) {
+    margin-left: 17.5em;
+  }
+
+
 `;
 
 const LogoContainer = styled(Link)`
@@ -75,12 +86,19 @@ const LogoContainer = styled(Link)`
 `;
 
 const HeaderInput = styled.input`
-  height: 100%;
-  flex: 1;
-  outline: none;
-  border: none;
-  background-color: transparent;
-  color: white;
+  display: none;
+
+  @media screen and (min-width: 635px) {
+    display: block;
+    height: 100%;
+    outline: none;
+    border: none;
+    background-color: transparent;
+    color: white;
+    margin-right: auto;
+    /* padding-inline: 1em; */
+    flex: 1;
+  }
 `;
 
 const HeaderActions = styled.div`
@@ -106,6 +124,11 @@ const HeaderProfileContainer = styled.div`
   }
 
   p {
-    margin-right: 0.5em;
+    display: none;
+
+    @media screen and (min-width: 435px) {
+      display: block;
+      margin-right: 0.5em;
+    }
   }
 `;

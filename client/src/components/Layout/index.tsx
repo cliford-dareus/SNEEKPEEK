@@ -18,7 +18,15 @@ const index = () => {
 export default index;
 
 const Container = styled.div`
-  margin-inline: 7%;
+  margin-inline: 2%;
+  
+  @media screen and (min-width: 425px){
+    margin-inline: 4%;
+  }
+
+  @media screen and (min-width: 1028px){
+    margin-inline: 7%;
+  }
 `;
 
 const MainContainer = styled.div`
