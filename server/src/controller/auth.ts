@@ -4,10 +4,16 @@ import { Token } from "../models/Token";
 import { Request, Response } from "express";
 import { StatusCodes, ReasonPhrases } from "http-status-codes";
 import createTokenUser from "../utils/createTokenUser";
-import { attachCookiesToResponse, createAccessToken } from "../utils/jwt";
+import {
+  attachCookiesToResponse,
+  clearRefreshToken,
+  createAccessToken,
+  jwtVerify,
+} from "../utils/jwt";
 import { UserToken } from "../types/models.type";
 import crypto from "crypto";
 
+//Sign Up
 const signUp = async (req: Request, res: Response) => {
   try {
     const { name, username, email, password } = req.body;
@@ -46,6 +52,7 @@ const signUp = async (req: Request, res: Response) => {
   }
 };
 
+//Sign In
 const signIn = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
@@ -103,8 +110,78 @@ const signIn = async (req: Request, res: Response) => {
   } catch (error) {}
 };
 
+//Sign Out
 const signOut = async (req: Request, res: Response) => {};
 
-const refreshToken = async (req: Request, res: Response) => {};
+//RefreshToken
+const refreshTokenFn = async (req: Request, res: Response) => {
+  const { refreshToken } = req.signedCookies;
 
-export { signUp, signIn, signOut, refreshToken };
+  if (!refreshToken) {
+    return res.status(StatusCodes.NO_CONTENT);
+  }
+
+  try {
+    const decodedRefreshToken = jwtVerify({ payload: refreshToken });
+    const isTokenExist = await Token.findOne({
+      refreshToken: decodedRefreshToken?.refreshToken,
+    });
+
+    if (!isTokenExist) {
+      const isExist = false;
+      await clearRefreshToken(req, res, false);
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        message: ReasonPhrases.UNAUTHORIZED,
+      });
+    }
+
+    try {
+      const user = await User.findOne({
+        _id: decodedRefreshToken?.user?.userId,
+      });
+
+      if (!user) {
+        await clearRefreshToken(req, res, true);
+        return res.status(StatusCodes.UNAUTHORIZED);
+      }
+
+      const UserToken = { username: user.username, userId: user._id };
+      const accessToken = createAccessToken(UserToken);
+
+      res.status(StatusCodes.OK).json({
+        status: StatusCodes.OK,
+        data: { ...UserToken, accessToken },
+      });
+    } catch (error) {
+      res.status(StatusCodes.BAD_REQUEST);
+    }
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST);
+  }
+};
+
+const resetPassword = async (req: Request, res: Response) => {
+  const userId = req.user;
+  const { oldpassword, newpassword } = req.body;
+
+  if (!oldpassword || !newpassword) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: "Both fields are required...",
+    });
+  }
+
+  try {
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        message: "Invalid credentials",
+      });
+    }
+  } catch (error) {}
+};
+
+export { signUp, signIn, signOut, refreshTokenFn, resetPassword };

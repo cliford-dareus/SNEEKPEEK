@@ -1,11 +1,16 @@
 import ms from "ms";
 import jwt from "jsonwebtoken";
-import { ObjectId } from "mongoose";
-import { IAccessToken, IJwtUser } from "../types/jwt";
-import { ICreateJwtPayLoad, IUserTokenPayLoad, UserToken } from "../types/models.type";
+import { IJwtUser } from "../types/jwt";
+import {
+  ICreateJwtPayLoad,
+  IUserTokenPayLoad,
+  UserToken,
+} from "../types/models.type";
+import { Request, Response } from "express";
+import { Token } from "../models/Token";
 
-export const jwtVerify = ({ accessToken }: { accessToken: string }) => {
-  return jwt.verify(accessToken, process.env.JWT_SECRET!) as IJwtUser;
+export const jwtVerify = ({ payload }: { payload: string }) => {
+  return jwt.verify(payload, process.env.JWT_SECRET!) as IJwtUser;
 };
 
 const createJWT = ({ payload }: ICreateJwtPayLoad) => {
@@ -19,15 +24,36 @@ export const attachCookiesToResponse = ({
   refreshToken,
 }: IUserTokenPayLoad) => {
   const refreshTokenJWT = createJWT({ payload: { user, refreshToken } });
-  
+
   res.cookie("refreshToken", refreshTokenJWT, {
     httpOnly: true,
     secure: false,
     signed: true,
-    expires: new Date(Date.now() + ms('1d')),
+    expires: new Date(Date.now() + ms("1d")),
   });
 };
 
 export const createAccessToken = (user: UserToken) => {
   return createJWT({ payload: { user } });
-}
+};
+
+export const clearRefreshToken = async (
+  req: Request,
+  res: Response,
+  isExist?: boolean
+) => {
+  const { refreshToken } = req.signedCookies;
+
+  if (refreshToken && isExist) {
+    const decodedRefreshToken = jwtVerify({ payload: refreshToken });
+    await Token.findOneAndDelete({
+      refreshToken: decodedRefreshToken?.refreshToken,
+    });
+  }
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false,
+    signed: true,
+  });
+};

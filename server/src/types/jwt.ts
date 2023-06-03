@@ -1,9 +1,11 @@
-import { ObjectId } from 'mongoose'
+import { ObjectId } from "mongoose";
 
 export interface IJwtUser {
-  id: ObjectId
+  id: ObjectId;
+  refreshToken: string;
+  user: { username: string; userId: string };
 }
 
 export interface IAccessToken {
-  accessToken: string
+  accessToken: string;
 }
