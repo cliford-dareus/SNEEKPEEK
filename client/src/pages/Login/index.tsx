@@ -1,8 +1,23 @@
+import { LoginForm } from "../../components/AuthForm";
+import {
+  AuthPageContainer,
+  AuthPageFormContainer,
+  AuthPageImageContainer,
+} from "../../lib/styled-component/styles";
+import Image from "../../assets/Instagram post - 1.png";
 
 const index = () => {
   return (
-    <div>index</div>
-  )
-}
+    <AuthPageContainer>
+      <AuthPageImageContainer>
+        <img src={Image} alt="" />
+      </AuthPageImageContainer>
 
-export default index
+      <AuthPageFormContainer>
+        <LoginForm />
+      </AuthPageFormContainer>
+    </AuthPageContainer>
+  );
+};
+
+export default index;

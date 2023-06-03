@@ -42,7 +42,8 @@ const signUp = async (req: Request, res: Response) => {
     });
 
     res.status(StatusCodes.CREATED).json({
-      user,
+      status: StatusCodes.CREATED,
+      message: ReasonPhrases.CREATED
     });
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).send({

@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Layout from "./components/Layout";
 import Profile from "./pages/Profile";
 import Message from "./components/SideContent/messages";
@@ -9,19 +11,23 @@ import { GlobalStyles } from "./lib/styled-component/globalStyles";
 
 function App() {
   return (
-    <div>
+    <>
       <GlobalStyles />
       <Routes>
+        <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
+
         <Route element={<Layout />}>
+          <Route path="profile" element={<Profile />} />
+
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<Message />} />
             <Route path="mention" element={<Mention />} />
             <Route path="request" element={<Request />} />
           </Route>
-          <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
-    </div>
+    </>
   );
 }
 

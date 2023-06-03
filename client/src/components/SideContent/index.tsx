@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import LoginForm from "../LoginForm";
+import { LoginForm } from "../AuthForm";
 
 const index = () => {
   const isLogin = false;

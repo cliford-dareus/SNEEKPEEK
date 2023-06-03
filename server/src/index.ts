@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import CookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import morgan from "morgan";
-// import cors from "cors";
+import cors from "cors";
 dotenv.config();
 
 import authRouter from './router/auth';
@@ -10,7 +10,7 @@ import connectDB from "./db/connect";
 
 const app = express();
 
-// app.use(cors);
+app.use(cors({origin: 'http://localhost:5173',credentials: true}));
 app.use(express.json());
 app.use(morgan("combined"));
 app.use(CookieParser(process.env.JWT_SECRET));

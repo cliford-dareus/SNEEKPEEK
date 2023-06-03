@@ -1,9 +1,23 @@
-import React from 'react'
+import {
+  AuthPageContainer,
+  AuthPageFormContainer,
+  AuthPageImageContainer,
+} from "../../lib/styled-component/styles";
+import { Register } from "../../components/AuthForm";
+import Image from "../../assets/Instagram post - 1.png";
 
 const index = () => {
   return (
-    <div>index</div>
-  )
-}
+    <AuthPageContainer>
+      <AuthPageImageContainer>
+        <img src={Image} alt="" />
+      </AuthPageImageContainer>
 
-export default index
+      <AuthPageFormContainer>
+        <Register />
+      </AuthPageFormContainer>
+    </AuthPageContainer>
+  );
+};
+
+export default index;

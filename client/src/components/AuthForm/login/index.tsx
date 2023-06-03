@@ -1,6 +1,10 @@
-import styled from "styled-components";
-import Button from "../Button";
+import Button from "../../Button";
 import { ChangeEvent, FormEvent, useState } from "react";
+import {
+  Form,
+  FormContainer,
+  InputField,
+} from "../../../lib/styled-component/styles";
 
 const index = () => {
   const [userInfo, setUserInfo] = useState({ username: "", password: "" });
@@ -11,10 +15,9 @@ const index = () => {
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
   };
 
-//   console.log(userInfo);
+  //   console.log(userInfo);
 
   return (
     <FormContainer>
@@ -44,28 +47,3 @@ const index = () => {
 };
 
 export default index;
-
-const FormContainer = styled.div`
-  padding: 1em;
-  background-color: var(--dark--color-800);
-  border-radius: 10px;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1em;
-  margin-top: 1em;
-  margin-bottom: 1em;
-`;
-
-const InputField = styled.input`
-  width: 100%;
-  display: flex;
-  border-radius: 30px;
-  font-size: 1.1rem;
-  padding: 0.5em 1em;
-  border: none;
-  outline: none;
-  /* margin-top: 1em; */
-`;
