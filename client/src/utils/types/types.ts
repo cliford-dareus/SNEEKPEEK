@@ -25,10 +25,17 @@ export interface IUserData {
   username: string;
   userId: string;
   accessToken: string;
-  expiresAt: any,
+  expiresAt: any;
 }
 
 export interface IUserDataResponse {
   data: IUserData;
   status: number;
 }
+
+export interface IRefreshTokenResponse {
+  status: number;
+  user: IUserData;
+}
+
+

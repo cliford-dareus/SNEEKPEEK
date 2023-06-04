@@ -35,7 +35,6 @@ const index = () => {
 
       const { data } = await loginUser(userInfo).unwrap();
       setUserInfo({ username: "", password: "" });
-      console.log(data)
       dispatch(setCredentials(data));
       Navigate("/");
     } catch (error) {}

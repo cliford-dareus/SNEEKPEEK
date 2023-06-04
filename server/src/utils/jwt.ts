@@ -5,7 +5,7 @@ import {
   ICreateJwtPayLoad,
   IUserTokenPayLoad,
   UserToken,
-} from "../types/models.type";
+} from "../types/user.type";
 import { Request, Response } from "express";
 import { Token } from "../models/Token";
 

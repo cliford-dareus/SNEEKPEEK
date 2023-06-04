@@ -2,6 +2,7 @@ import { baseUrl } from "../../utils/proxy";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
   ILoginPayload,
+  IRefreshTokenResponse,
   IRegisterPayload,
   IUserDataResponse,
 } from "../../utils/types/types";
@@ -43,7 +44,7 @@ export const authApi = createApi({
         method: "POST",
       }),
     }),
-    refreshToken: builder.mutation({
+    refreshToken: builder.mutation<IRefreshTokenResponse, any>({
       query: () => ({
         url: "/auth/refresh-token",
         method: "POST",

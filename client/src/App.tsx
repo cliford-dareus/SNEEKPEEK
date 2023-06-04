@@ -18,17 +18,19 @@ import { setCredentials } from "./features/slice/authSlice";
 
 function App() {
   const auth = useAuth();
-  const [refresh] = useRefreshTokenMutation();
+  const [refresh, { isLoading }] = useRefreshTokenMutation();
   const dispatch = useAppDispatch();
 
   const refreshAccessToken = useCallback(async () => {
     try {
-      const { data } = await refresh({});
-      console.log(data.data);
-      if (data.status === 204) {
+      const data = await refresh({}).unwrap();
+
+      console.log(data.status)
+
+      if (data?.status === 204) {
         dispatch(removeCredentials());
       } else {
-        dispatch(setCredentials(data.data));
+        dispatch(setCredentials(data?.user));
       }
     } catch (error) {
       dispatch(removeCredentials());

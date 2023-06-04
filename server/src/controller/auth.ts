@@ -10,10 +10,10 @@ import {
   createAccessToken,
   jwtVerify,
 } from "../utils/jwt";
-import { UserToken } from "../types/models.type";
+import { UserToken } from "../types/user.type";
 import crypto from "crypto";
 
-//Sign Up
+// Sign Up
 const signUp = async (req: Request, res: Response) => {
   try {
     const { name, username, email, password } = req.body;
@@ -87,7 +87,7 @@ const signIn = async (req: Request, res: Response) => {
       const accessToken = createAccessToken(UserToken);
       res.status(StatusCodes.OK).json({
         status: StatusCodes.OK,
-        data: {
+        user: {
           ...UserToken,
           accessToken,
           expiresAt: new Date(Date.now() + ms("15m")),
@@ -110,7 +110,7 @@ const signIn = async (req: Request, res: Response) => {
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
-      data: {
+      user: {
         ...UserToken,
         accessToken,
         expiresAt: new Date(Date.now() + ms("15m")),
@@ -120,7 +120,9 @@ const signIn = async (req: Request, res: Response) => {
 };
 
 //Sign Out
-const signOut = async (req: Request, res: Response) => {};
+const signOut = async (req: Request, res: Response) => {
+  
+};
 
 //RefreshToken
 const refreshTokenFn = async (req: Request, res: Response) => {
@@ -160,7 +162,7 @@ const refreshTokenFn = async (req: Request, res: Response) => {
 
       res.status(StatusCodes.OK).json({
         status: StatusCodes.OK,
-        data: {
+        user: {
           ...UserToken,
           accessToken,
           expiresAt: new Date(Date.now() + ms("15m")),
