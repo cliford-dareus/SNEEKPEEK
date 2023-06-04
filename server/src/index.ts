@@ -7,6 +7,7 @@ dotenv.config();
 
 import authRouter from "./router/auth";
 import postRouter from "./router/post";
+import commentRouter from "./router/comment";
 
 import connectDB from "./db/connect";
 
@@ -19,6 +20,7 @@ app.use(CookieParser(process.env.JWT_SECRET));
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/post", postRouter);
+app.use("/api/v1/comment", commentRouter);
 
 const PORT = process.env.PORT || 4000;
 

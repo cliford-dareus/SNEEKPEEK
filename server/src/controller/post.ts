@@ -2,6 +2,7 @@ import Post from "../models/Post";
 import { Request, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 
+//Create Post
 const createPost = async (req: Request, res: Response) => {
   const { content, image } = req.body;
   const id = req.user;
@@ -29,6 +30,7 @@ const createPost = async (req: Request, res: Response) => {
   }
 };
 
+// Edit Post
 const editPost = async (req: Request, res: Response) => {
   const { postId, content, image } = req.body;
   const id = req.user;
@@ -70,6 +72,7 @@ const editPost = async (req: Request, res: Response) => {
   }
 };
 
+// Delete Post
 const deletePost = async (req: Request, res: Response) => {
   const { postId } = req.params;
   const id = req.user;
@@ -96,6 +99,7 @@ const deletePost = async (req: Request, res: Response) => {
   }
 };
 
+// Like Post
 const likeOrUnlikePost = async (req: Request, res: Response) => {
   const { postId } = req.params;
   const id = req.user;
@@ -104,7 +108,9 @@ const likeOrUnlikePost = async (req: Request, res: Response) => {
     const post = await Post.findOne({ _id: postId });
 
     if (!post) {
-      return res.status(StatusCodes.BAD_REQUEST).json({message: 'No post wid this id'});
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "No post wid this id" });
     }
 
     if (post.likes.includes(id)) {
@@ -128,4 +134,29 @@ const likeOrUnlikePost = async (req: Request, res: Response) => {
   }
 };
 
-export { createPost, editPost, deletePost, likeOrUnlikePost };
+// Get All Posts
+const getAllPost = async (req: Request, res: Response) => {
+    console.log('here')
+  try {
+    const post = await Post.find()
+      .populate("likes", ['_id', 'username'])
+      .populate("author", ["username", "_id", "image"] )
+      .populate("comments")
+      .exec();
+
+    res.status(StatusCodes.OK).json({
+      post,
+    });
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
+};
+
+// Get Friends and Personal Posts
+
+// Get Tagged In Posts
+
+export { createPost, editPost, deletePost, likeOrUnlikePost, getAllPost };
