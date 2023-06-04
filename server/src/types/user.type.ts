@@ -7,6 +7,9 @@ export interface IUser {
   username: string;
   password: string;
   email: string;
+  request: ObjectId[];
+  followers: ObjectId[];
+  following: ObjectId[];
 }
 
 export interface IToken {

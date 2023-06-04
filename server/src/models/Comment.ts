@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { IComment } from "../types/comment.type";
 // import { IPost } from "../types/post.type";
 
 const CommentSchema = new mongoose.Schema(
@@ -10,5 +11,5 @@ const CommentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Comment = mongoose.model("Comment", CommentSchema);
+const Comment = mongoose.model<IComment>("Comment", CommentSchema);
 export default Comment;
