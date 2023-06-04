@@ -9,7 +9,7 @@ import {
 import { useSignUpUserMutation } from "../../../features/api/auth";
 
 const index = () => {
-  const [signUpUser] =
+  const [signUpUser, { isLoading }] =
     useSignUpUserMutation();
   const [userInfo, setUserInfo] = useState<IRegisterPayload>({
     username: "",
@@ -32,7 +32,7 @@ const index = () => {
         return;
       }
       await signUpUser(userInfo);
-
+      setUserInfo({username: '', name: '', password: '', email: ''})
     } catch (error) {
 
     }
@@ -75,7 +75,7 @@ const index = () => {
           value={userInfo.password}
           required
         />
-        <Button label="Sign Up"/>
+        <Button label="Sign Up" isLoading={isLoading}/>
       </Form>
 
       <p>New to SneekPeek? Sign Up here</p>

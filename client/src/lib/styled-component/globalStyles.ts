@@ -28,7 +28,7 @@ export const GlobalStyles = createGlobalStyle`
 
         --primary-color--900: ;
         --primary--color-400: #06b6d4;
-        --primary--color-200: ;
+        --primary--color-300: #2DF8BB;
 
 
         --txt--color-100: whitesmoke;

@@ -2,9 +2,12 @@ import { Outlet } from "react-router";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { LoginForm } from "../AuthForm";
+import { useAppSelector } from "../../app/hooks";
+import { selectCurrentUser } from "../../features/slice/authSlice";
 
 const index = () => {
-  const isLogin = false;
+  const isLogin = useAppSelector(selectCurrentUser).token;
+  
   return (
     <SideContentContainer>
       {isLogin ? (

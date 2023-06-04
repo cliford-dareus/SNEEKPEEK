@@ -5,19 +5,41 @@ import {
   FormContainer,
   InputField,
 } from "../../../lib/styled-component/styles";
+import { ILoginPayload } from "../../../utils/types/types";
+import { useSignInUserMutation } from "../../../features/api/auth";
+import { useNavigate } from "react-router-dom";
+import { setCredentials } from "../../../features/slice/authSlice";
+import { useAppDispatch } from "../../../app/hooks";
 
 const index = () => {
-  const [userInfo, setUserInfo] = useState({ username: "", password: "" });
+  const dispatch = useAppDispatch();
+  const [loginUser, { isLoading }] = useSignInUserMutation();
+  const Navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState<ILoginPayload>({
+    username: "",
+    password: "",
+  });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
   };
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  };
 
-  //   console.log(userInfo);
+    try {
+      const { username, password } = userInfo;
+      if (!username || !password) {
+        return;
+      }
+
+      const { data } = await loginUser(userInfo).unwrap();
+      setUserInfo({ username: "", password: "" });
+      console.log(data)
+      dispatch(setCredentials(data));
+      Navigate("/");
+    } catch (error) {}
+  };
 
   return (
     <FormContainer>
@@ -38,7 +60,7 @@ const index = () => {
           name="password"
           value={userInfo.password}
         />
-        <Button label="Sign In" />
+        <Button label="Sign In" isLoading={isLoading} />
       </Form>
 
       <p>New to SneekPeek? Sign Up here</p>

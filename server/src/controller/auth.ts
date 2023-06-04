@@ -43,7 +43,7 @@ const signUp = async (req: Request, res: Response) => {
 
     res.status(StatusCodes.CREATED).json({
       status: StatusCodes.CREATED,
-      message: ReasonPhrases.CREATED
+      message: ReasonPhrases.CREATED,
     });
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).send({
@@ -87,7 +87,11 @@ const signIn = async (req: Request, res: Response) => {
       const accessToken = createAccessToken(UserToken);
       res.status(StatusCodes.OK).json({
         status: StatusCodes.OK,
-        data: { ...UserToken, accessToken },
+        data: {
+          ...UserToken,
+          accessToken,
+          expiresAt: new Date(Date.now() + ms("15m")),
+        },
       });
       return;
     }
@@ -106,7 +110,11 @@ const signIn = async (req: Request, res: Response) => {
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
-      data: { ...UserToken, accessToken },
+      data: {
+        ...UserToken,
+        accessToken,
+        expiresAt: new Date(Date.now() + ms("15m")),
+      },
     });
   } catch (error) {}
 };
@@ -152,7 +160,11 @@ const refreshTokenFn = async (req: Request, res: Response) => {
 
       res.status(StatusCodes.OK).json({
         status: StatusCodes.OK,
-        data: { ...UserToken, accessToken },
+        data: {
+          ...UserToken,
+          accessToken,
+          expiresAt: new Date(Date.now() + ms("15m")),
+        },
       });
     } catch (error) {
       res.status(StatusCodes.BAD_REQUEST);
