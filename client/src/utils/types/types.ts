@@ -38,6 +38,11 @@ export interface IRefreshTokenResponse {
   user: IUserData;
 }
 
+export interface IPostPayload {
+  content: string;
+  image: string
+}
+
 export interface IPost {
   _id: string;
   author: {

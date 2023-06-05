@@ -4,6 +4,7 @@ import Button from "../../../../components/Button";
 import CreatePostModal from "./CreatePostModal";
 import Label from "./Label";
 import React, { FormEvent, useState } from "react";
+import { usePostMutation } from "../../../../features/api/post";
 
 interface IPost {
   content: string;
@@ -11,6 +12,7 @@ interface IPost {
 }
 
 const index = () => {
+  const [createPost] = usePostMutation();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [post, setPost] = useState<IPost>({
     content: "",
@@ -23,7 +25,9 @@ const index = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(post);
+    const data = await createPost(post).unwrap()
+    console.log(data);
+
   };
 
   return (
@@ -54,12 +58,12 @@ const index = () => {
           </CreatePostContentActions>
         </form>
         {openModal && (
-            <CreatePostModal
-              setOpenModal={setOpenModal}
-              value={post.image}
-              handleInput={handleInput}
-            />
-          )}
+          <CreatePostModal
+            setOpenModal={setOpenModal}
+            value={post.image}
+            handleInput={handleInput}
+          />
+        )}
       </CreatePostContent>
     </CreatePostContainer>
   );
