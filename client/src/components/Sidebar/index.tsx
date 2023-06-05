@@ -111,16 +111,16 @@ const SidebarContainer = styled.aside`
 
   @media screen and (min-width: 635px) {
     width: 49px;
-    height: 45%;
+    min-width: 49px;
+    height: 50%;
     background-color: var(--dark--color-800);
     border-radius: 10px;
     overflow: hidden;
     display: flex;
   }
 
-  @media screen and (min-width: 1035px) {
+  @media screen and (min-width: 1235px) {
     width: 300px;
-    height: 45%;
   }
 `;
 

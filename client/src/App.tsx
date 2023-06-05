@@ -25,8 +25,6 @@ function App() {
     try {
       const data = await refresh({}).unwrap();
 
-      console.log(data.status)
-
       if (data?.status === 204) {
         dispatch(removeCredentials());
       } else {

@@ -38,4 +38,18 @@ export interface IRefreshTokenResponse {
   user: IUserData;
 }
 
-
+export interface IPost {
+  _id: string;
+  author: {
+    _id: string;
+    username: string;
+  };
+  content: string;
+  image: string;
+  likes: [];
+  comments: [];
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}

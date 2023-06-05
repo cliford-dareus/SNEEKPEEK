@@ -12,10 +12,17 @@ export const FlexCol = styled.div`
 export const PageContainer = styled.div`
   flex: 1;
   flex-shrink: 0;
-  min-width: 400px;
   height: calc(100vh - 60px - 1em);
   overflow-y: scroll;
   position: relative;
+
+   &::-webkit-scrollbar{
+    display: none;
+  }
+
+  @media screen and (min-width: 1035px) {
+    min-width: 400px;
+  }
 `;
 
 export const AuthPageContainer = styled.div`
@@ -92,6 +99,7 @@ export const PageTitle = styled.div`
   padding: 1em;
   position: sticky;
   border-radius: 10px;
+  z-index: 99999;
   top: 0;
   background-color: var(--dark--color-800);
 

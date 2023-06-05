@@ -7,6 +7,7 @@ import { selectCurrentUser } from "../../features/slice/authSlice";
 
 const index = () => {
   const isLogin = useAppSelector(selectCurrentUser).token;
+
   
   return (
     <SideContentContainer>
@@ -47,10 +48,8 @@ export default index;
 
 const SideContentContainer = styled.aside`
   display: none;
-  /* background-color: var(--dark--color-800); */
-  /* height: 100%; */
-
-  @media screen and (min-width: 785px) {
+  
+  @media screen and (min-width: 855px) {
     display: block;
     border-radius: 10px;
     width: 350px;

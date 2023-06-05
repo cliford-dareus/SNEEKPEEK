@@ -1,24 +1,13 @@
-import { baseUrl } from "../../utils/proxy";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   ILoginPayload,
   IRefreshTokenResponse,
   IRegisterPayload,
   IUserDataResponse,
 } from "../../utils/types/types";
-import { RootState } from "../../app/store";
+import { baseQuery } from "../../utils/Private/PrivateQuery";
 
-const baseQuery = fetchBaseQuery({
-  baseUrl,
-  credentials: "include",
-  prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState)?.auth.token;
-    if (token) {
-      headers.set("authorization", `Bearer ${token}`);
-    }
-    return headers;
-  },
-});
+
 
 export const authApi = createApi({
   reducerPath: "authApi",

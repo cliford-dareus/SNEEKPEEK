@@ -1,10 +1,18 @@
 import styled from "styled-components";
 import Loader from "../../components/Loader";
 
-const index = ({ label, isLoading }: { label: string; isLoading: boolean }) => {
+const index = ({
+  label,
+  isLoading,
+  color,
+}: {
+  label: string;
+  isLoading: boolean;
+  color?: boolean;
+}) => {
   return (
     //Add styling for btn disabled
-    <Button disabled={isLoading}>
+    <Button disabled={isLoading} $bg={color} >
       {!isLoading ? (
         <p>{label}</p>
       ) : (
@@ -18,15 +26,22 @@ const index = ({ label, isLoading }: { label: string; isLoading: boolean }) => {
 
 export default index;
 
-const Button = styled.button`
+interface BgProp {
+  readonly $bg: boolean;
+}
+
+const Button = styled.button<BgProp>`
   display: flex;
   align-items: center;
   justify-content: center;
   outline: none;
   border: none;
   border-radius: 30px;
-  padding: 0.5em;
+  padding: 0.5em 1em;
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
+  background-color: ${(props) =>
+    props.$bg === true ? "var(--primary--color-400)" : ""};
+  color: ${(props) => (props.$bg === true ? "white" : "")};
 `;

@@ -9,10 +9,11 @@ import { ILoginPayload } from "../../../utils/types/types";
 import { useSignInUserMutation } from "../../../features/api/auth";
 import { useNavigate } from "react-router-dom";
 import { setCredentials } from "../../../features/slice/authSlice";
-import { useAppDispatch } from "../../../app/hooks";
+// import { useAppDispatch } from "../../../app/hooks";
+import { useDispatch } from "react-redux";
 
 const index = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const [loginUser, { isLoading }] = useSignInUserMutation();
   const Navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<ILoginPayload>({
