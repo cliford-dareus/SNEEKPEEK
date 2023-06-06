@@ -5,7 +5,7 @@ import { IPost, IPostPayload } from "../../utils/types/types";
 export const postApi = createApi({
   reducerPath: "postApi",
   baseQuery,
-  tagTypes: ['Post'],
+  tagTypes: ["Post"],
   endpoints: (builder) => ({
     getPost: builder.query({
       query: () => ({
@@ -28,9 +28,28 @@ export const postApi = createApi({
         method: "POST",
         body: postPaylod,
       }),
-      invalidatesTags: ['Post']
+      invalidatesTags: ["Post"],
+    }),
+    updatePost: builder.mutation({
+      query: ({ postId, ...rest }) => ({
+        url: `/post/${postId}`,
+        method: "PATCH",
+        body: rest,
+      }),
+    }),
+    likeOrUnlikePost: builder.mutation({
+      query: (postId) => ({
+        url: `/post/${postId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: (arg) => [{ type: "Post", id: arg.id }],
     }),
   }),
 });
 
-export const { useGetPostQuery, usePostMutation } = postApi;
+export const {
+  useGetPostQuery,
+  usePostMutation,
+  useUpdatePostMutation,
+  useLikeOrUnlikePostMutation,
+} = postApi;

@@ -5,6 +5,7 @@ import {
   deletePost,
   editPost,
   getAllPost,
+  getPostwithCommment,
   likeOrUnlikePost,
 } from "../controller/post";
 
@@ -15,6 +16,7 @@ router.route("/edit").patch(isAuthenticated, editPost);
 router
   .route("/:postId")
   .delete(isAuthenticated, deletePost)
-  .patch(isAuthenticated, likeOrUnlikePost);
+  .patch(isAuthenticated, likeOrUnlikePost)
+  .get(getPostwithCommment);
 
 export default router;

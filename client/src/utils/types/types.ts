@@ -40,7 +40,7 @@ export interface IRefreshTokenResponse {
 
 export interface IPostPayload {
   content: string;
-  image: string
+  image: string;
 }
 
 export interface IPost {
@@ -51,9 +51,24 @@ export interface IPost {
   };
   content: string;
   image: string;
-  likes: [];
-  comments: [];
+  likes: ILikes[];
+  comments: IComment[];
   featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+export interface ILikes{
+  _id: string;
+  username: string;
+  createdAt: string
+}
+
+export interface IComment {
+  _id: string;
+  author: string;
+  content: string;
   createdAt: string;
   updatedAt: string;
   __v: number;

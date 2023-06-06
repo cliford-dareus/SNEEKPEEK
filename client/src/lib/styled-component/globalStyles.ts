@@ -21,10 +21,10 @@ export const GlobalStyles = createGlobalStyle`
         --dark--color-900: #000000;
         --dark--color-800: #0a0a0a;
 
-        --light--color-400: ;
-        --light--color-400: ;
-        --light--color-400: ;
-        --light--color-400: ;
+        --light--color-600: ;
+        --light--color-500: ;
+        --light--color-400: #c3c1c1;
+        --light--color-300: ;
 
         --primary-color--900: ;
         --primary--color-400: #06b6d4;

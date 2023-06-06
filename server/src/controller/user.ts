@@ -6,6 +6,26 @@ import { checkUserIdentity } from "../utils/checkUserIdentity";
 import { ObjectId } from "mongoose";
 
 // Get User by id
+const getUser = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      throw new Error("user does not exist");
+    }
+    const { password, __v, ...otherInfo } = user;
+    res.status(200).send({
+      status: "success",
+      message: "user info",
+      user: otherInfo,
+    });
+  } catch (e) {
+    res.status(500).send({
+      status: "failure",
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
+};
 
 // Get User by username
 
@@ -144,4 +164,4 @@ const declineRequest = async (req: Request, res: Response) => {
     }
 };
 
-export { followUser, acceptRequest };
+export { followUser, acceptRequest, getUser };

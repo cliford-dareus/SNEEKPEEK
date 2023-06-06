@@ -1,6 +1,8 @@
 import Post from "../models/Post";
 import { Request, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
+import { User } from "../models/User";
+import Comment from "../models/Comment";
 
 //Create Post
 const createPost = async (req: Request, res: Response) => {
@@ -105,13 +107,16 @@ const likeOrUnlikePost = async (req: Request, res: Response) => {
   const id = req.user;
 
   try {
-    const post = await Post.findOne({ _id: postId });
-
+    const post = await Post.findById(postId);
+    console.log('POST' + post)
     if (!post) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "No post wid this id" });
     }
+
+    
+  console.log('USER ID' + id)
 
     if (post.likes.includes(id)) {
       await post.updateOne({ $pull: { likes: id } });
@@ -136,12 +141,12 @@ const likeOrUnlikePost = async (req: Request, res: Response) => {
 
 // Get All Posts
 const getAllPost = async (req: Request, res: Response) => {
-    console.log('here')
+  console.log("here");
   try {
     const post = await Post.find()
-      .populate("likes", ['_id', 'username'])
-      .populate("author", ["username", "_id", "image"] )
-      .populate("comments")
+      .populate("likes", ["_id", "username", "createdAt"])
+      .populate("author", ["username", "_id", "image"])
+      .populate("comments", ["_id", "author", "content"])
       .exec();
 
     res.status(StatusCodes.OK).json({
@@ -159,4 +164,43 @@ const getAllPost = async (req: Request, res: Response) => {
 
 // Get Tagged In Posts
 
-export { createPost, editPost, deletePost, likeOrUnlikePost, getAllPost };
+// Get Post by id and comment fill with users username and pic
+const getPostwithCommment = async (req: Request, res: Response) => {
+  const { postId } = req.params;
+  try {
+    const post = await Post.findOne({ _id: postId });
+    if (!post) {
+      return;
+    }
+
+    const comment = await Promise.all(
+      post.comments.map(async (ct) => {
+        const comment = await Comment.findById(ct);
+
+        const user = await User.findById(comment?.author, {
+          username: true,
+          image: true,
+        });
+
+        return {
+          user,
+          comment,
+        };
+      })
+    );
+
+    res.status(StatusCodes.OK).json({
+      message: "",
+      comment,
+    });
+  } catch (error) {}
+};
+
+export {
+  createPost,
+  editPost,
+  deletePost,
+  likeOrUnlikePost,
+  getAllPost,
+  getPostwithCommment,
+};

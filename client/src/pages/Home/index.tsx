@@ -10,6 +10,14 @@ const index = () => {
   const auth = useAuth();
   const { data, isLoading } = useGetPostQuery("");
 
+  const sortedData = () => {
+    const dataCopy = data.post.slice();
+    return dataCopy.sort(
+      (a: any, b: any) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  };
+
   return (
     <PageContainer>
       <PageTitle>
@@ -21,7 +29,7 @@ const index = () => {
       <div>
         {!isLoading ? (
           <div>
-            {data?.post.map((post: IPost) => (
+            {sortedData().map((post: IPost) => (
               <Card post={post} />
             ))}
           </div>
