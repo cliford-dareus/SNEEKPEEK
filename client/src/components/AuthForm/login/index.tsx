@@ -9,13 +9,13 @@ import { ILoginPayload } from "../../../utils/types/types";
 import { useSignInUserMutation } from "../../../features/api/auth";
 import { useNavigate } from "react-router-dom";
 import { setCredentials } from "../../../features/slice/authSlice";
-// import { useAppDispatch } from "../../../app/hooks";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "../../../app/hooks";
+// import { useDispatch } from "react-redux";
 
 const index = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [loginUser, { isLoading }] = useSignInUserMutation();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<ILoginPayload>({
     username: "",
     password: "",
@@ -35,9 +35,9 @@ const index = () => {
       }
 
       const { data } = await loginUser(userInfo).unwrap();
-      setUserInfo({ username: "", password: "" });
+      // setUserInfo({ username: "", password: "" });
       dispatch(setCredentials(data));
-      Navigate("/");
+      navigate("/");
     } catch (error) {}
   };
 

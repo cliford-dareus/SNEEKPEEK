@@ -59,10 +59,10 @@ function App() {
     <>
       <GlobalStyles />
       <Routes>
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-        <Route element={<Layout />}>
+        <Route path='/' element={<Layout />}>
           <Route element={<PrivateOutlet />}>
             <Route path="profile" element={<Profile />} />
           </Route>

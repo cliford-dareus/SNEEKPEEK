@@ -20,6 +20,7 @@ export const authSlice = createSlice({
       state.user = { userId, username };
       state.token = accessToken;
       state.expiresAt = expiresAt
+      console.log(username)
     },
     removeCredentials: (state) => {
       state.user = { userId: "", username: ""};

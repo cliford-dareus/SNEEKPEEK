@@ -1,14 +1,33 @@
 import { Flex } from "../../lib/styled-component/styles";
 import styled from "styled-components";
-import SideContent from "../SideContent";
+import SideContent from '../SideContent'
 import Explore from "../../pages/Home";
+import { Link, Outlet } from "react-router-dom";
+
 
 const index = () => {
   return (
     <DashboardLayoutContainer>
       <Flex style={{ height: "100%", gap: "1em" }}>
         <Explore />
-        <SideContent />
+        <SideContent>
+          <SideContentMenu>
+              <li>
+                <SideContntBtn to="." data-active="true">
+                  Messages
+                </SideContntBtn>
+              </li>
+              <li>
+                <SideContntBtn to="mention">Mentions</SideContntBtn>
+              </li>
+              <li>
+                <SideContntBtn to="request">Requests</SideContntBtn>
+              </li>
+            </SideContentMenu>
+            <div>
+              <Outlet />
+            </div>
+        </SideContent>
       </Flex>
     </DashboardLayoutContainer>
   );
@@ -19,3 +38,26 @@ export default index;
 const DashboardLayoutContainer = styled.div`
   flex: 1;
 `;
+
+const SideContentMenu = styled.ul`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  margin-bottom: 1em;
+`;
+
+const SideContntBtn = styled(Link)`
+  outline: none;
+  border: none;
+  padding: 0.3em 0;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+
+  &[data-active="true"] {
+    border-bottom: 2px solid white;
+  }
+`;
+
+
