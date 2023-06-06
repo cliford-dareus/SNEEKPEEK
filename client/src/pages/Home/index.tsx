@@ -8,11 +8,11 @@ import { useAuth } from "../../lib/hooks/useAuth";
 
 const index = () => {
   const auth = useAuth();
-  const { data, isLoading } = useGetPostQuery("");
+  const { data, isLoading, isError } = useGetPostQuery("");
 
   const sortedData = () => {
-    const dataCopy = data.post.slice();
-    return dataCopy.sort(
+    const dataCopy = data?.post.slice();
+    return dataCopy?.sort(
       (a: any, b: any) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
@@ -26,10 +26,12 @@ const index = () => {
 
       <div>{auth.token && <Featured />}</div>
 
+      {isError? <h2>Error Baby</h2>: null}
+
       <div>
         {!isLoading ? (
           <div>
-            {sortedData().map((post: IPost) => (
+            {sortedData()?.map((post: IPost) => (
               <Card post={post} />
             ))}
           </div>

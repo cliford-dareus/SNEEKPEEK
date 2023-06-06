@@ -7,9 +7,12 @@ export interface IUser {
   username: string;
   password: string;
   email: string;
+  image: string;
   request: ObjectId[];
   followers: ObjectId[];
   following: ObjectId[];
+  followersLength: number;
+  followingsLength: number;
 }
 
 export interface IToken {

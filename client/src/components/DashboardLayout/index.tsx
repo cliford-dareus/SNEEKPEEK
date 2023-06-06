@@ -1,13 +1,9 @@
 import { Flex } from "../../lib/styled-component/styles";
 import styled from "styled-components";
-import SideContent from '../SideContent'
+import SideContent from "../SideContent";
 import Explore from "../../pages/Home";
 
-
 const index = () => {
-  
-
-
   return (
     <DashboardLayoutContainer>
       <Flex style={{ height: "100%", gap: "1em" }}>
@@ -23,5 +19,3 @@ export default index;
 const DashboardLayoutContainer = styled.div`
   flex: 1;
 `;
-
-

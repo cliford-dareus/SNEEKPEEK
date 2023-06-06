@@ -27,6 +27,10 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethod>(
       trim: true,
       validate: [validator.isEmail, "Invalid email..."],
     },
+    image: {
+      type: String,
+      trim: true,
+    },
     password: {
       type: String,
       require: true,
@@ -49,6 +53,8 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethod>(
         ref: "User",
       },
     ],
+    followersLength: { tyoe: Number, default: 0 },
+    followingsLength: { tyoe: Number, default: 0 },
   },
   { timestamps: true }
 );

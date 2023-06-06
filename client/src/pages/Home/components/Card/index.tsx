@@ -19,9 +19,6 @@ const index = ({ post }: { post: IPost }) => {
   const [openComment, setOpenComment] = useState(false);
   // const { refresh } = useGetPostQuery();
 
-  const ms = getElaspeTime(post.createdAt)
-
-  console.log(ms)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,7 +42,7 @@ const index = ({ post }: { post: IPost }) => {
       <CardContent>
         <div>
           <p>{post.author.username}</p>
-          <CardDate>{getElaspeTime(post.createdAt)}</CardDate>
+          <CardDate>{getElaspeTime(post.createdAt)} ago</CardDate>
         </div>
 
         <div>

@@ -7,12 +7,12 @@ export function getElaspeTime(startTime: any) {
   let d = Math.floor(timeInms / (1000 * 60 * 60 * 24));
 
   if (h >= 24) {
-    return d + "days";
+    return d + " days";
   } else if (m >= 60) {
-    return h + "hours";
+    return h + " hours";
   } else if (s >= 60) {
-    return m + "minutes";
+    return m + " minutes";
   } else {
-    return s + "seconds";
+    return s + " seconds";
   }
 }
