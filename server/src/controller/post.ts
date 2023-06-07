@@ -108,15 +108,14 @@ const likeOrUnlikePost = async (req: Request, res: Response) => {
 
   try {
     const post = await Post.findById(postId);
-    console.log('POST' + post)
+    console.log("POST" + post);
     if (!post) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "No post wid this id" });
     }
 
-    
-  console.log('USER ID' + id)
+    console.log("USER ID" + id);
 
     if (post.likes.includes(id)) {
       await post.updateOne({ $pull: { likes: id } });
@@ -161,6 +160,28 @@ const getAllPost = async (req: Request, res: Response) => {
 };
 
 // Get Friends and Personal Posts
+const getUserPost = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return;
+    }
+    const post = await Post.find({ author: user._id });
+
+    res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      post,
+    });
+
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
+};
 
 // Get Tagged In Posts
 
@@ -202,5 +223,6 @@ export {
   deletePost,
   likeOrUnlikePost,
   getAllPost,
+  getUserPost,
   getPostwithCommment,
 };

@@ -1,7 +1,7 @@
 import { Response } from "express";
-import { Model, ObjectId } from "mongoose";
+import { Document, Model, ObjectId } from "mongoose";
 
-export interface IUser {
+export interface IUser extends Partial<Document>{
   _id: ObjectId;
   name: string;
   username: string;

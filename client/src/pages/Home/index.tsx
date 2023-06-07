@@ -2,7 +2,7 @@ import { useGetPostQuery } from "../../features/api/post";
 import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
 import Loader from "../../components/Loader";
 import { IPost } from "../../utils/types/types";
-import Card from "./components/Card";
+import Card from "../../components/Card";
 import Featured from "./components/CreatePost";
 import { useAuth } from "../../lib/hooks/useAuth";
 

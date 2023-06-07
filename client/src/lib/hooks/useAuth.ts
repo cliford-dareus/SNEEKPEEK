@@ -4,6 +4,5 @@ import { selectCurrentUser } from "../../features/slice/authSlice";
 
 export const useAuth = () => {
   const user = useSelector(selectCurrentUser);
-
   return useMemo(() => user, [user]);
 };

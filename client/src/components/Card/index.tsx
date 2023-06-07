@@ -1,15 +1,14 @@
 import styled from "styled-components";
-import { IPost } from "../../../../utils/types/types";
+import { IPost } from "../../utils/types/types";
 import { BsChatDots, BsFillHeartFill, BsHeart, BsTag } from "react-icons/bs";
-import CommentCard from "../CommentCard";
+import CommentCard from "../../pages/Home/components/CommentCard";
 import { FormEvent, useState } from "react";
-import { useAuth } from "../../../../lib/hooks/useAuth";
-import Button from "../../../../components/Button";
-import { usePostCommentMutation } from "../../../../features/api/comment";
-import {
-  useLikeOrUnlikePostMutation,
-} from "../../../../features/api/post";
-import { getElaspeTime } from "../../../../utils/functions/elaspeTime";
+import { useAuth } from "../../lib/hooks/useAuth";
+import Button from "../Button";
+import { usePostCommentMutation } from "../../features/api/comment";
+import { useLikeOrUnlikePostMutation } from "../../features/api/post";
+import { getElaspeTime } from "../../utils/functions/elaspeTime";
+import { Link } from "react-router-dom";
 
 const index = ({ post }: { post: IPost }) => {
   const auth = useAuth();
@@ -18,7 +17,6 @@ const index = ({ post }: { post: IPost }) => {
   const [likePost] = useLikeOrUnlikePostMutation();
   const [openComment, setOpenComment] = useState(false);
   // const { refresh } = useGetPostQuery();
-
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,15 +33,15 @@ const index = ({ post }: { post: IPost }) => {
 
   return (
     <CardContainer>
-      <CardImage>
+      <CardImage to={`${post.author.username}`}>
         <img src="" alt="" />
       </CardImage>
 
       <CardContent>
-        <div>
+        <Link to={`${post.author.username}`} style={{ color: "inherit" }}>
           <p>{post.author.username}</p>
           <CardDate>{getElaspeTime(post.createdAt)} ago</CardDate>
-        </div>
+        </Link>
 
         <div>
           <p>{post.content}</p>
@@ -133,7 +131,7 @@ const CardContainer = styled.div`
   padding: 1em;
 `;
 
-const CardImage = styled.div`
+const CardImage = styled(Link)`
   /* width: 20%; */
 
   img {
@@ -153,8 +151,8 @@ const CardContent = styled.div`
 const CardDate = styled.span`
   color: var(--light--color-400);
   display: block;
-  font-size: .85rem;
-  line-height: .9;
+  font-size: 0.85rem;
+  line-height: 0.9;
   margin-bottom: 1em;
 `;
 

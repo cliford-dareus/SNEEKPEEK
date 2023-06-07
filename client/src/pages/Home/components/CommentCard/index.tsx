@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useGetPostWithCommentQuery } from "../../../../features/api/comment";
 import Loader from '../../../../components/Loader'
+import { Link } from "react-router-dom";
 
 const index = ({ postId }: { postId: string }) => {
   const { data, isLoading } = useGetPostWithCommentQuery(postId);
@@ -10,13 +11,13 @@ const index = ({ postId }: { postId: string }) => {
       {!isLoading ? (
         data?.comment.map((comment: any) => (
           <CommentCardContainer>
-            <CommentCardImage>
+            <CommentCardImage to={`${comment.user.username}`}>
               <img src="" alt="" />
             </CommentCardImage>
 
             <CommentCardContent>
               <CommentCardAuthor>
-                <CommentCardAuthorName>@{comment.user.username}</CommentCardAuthorName>
+                <CommentCardAuthorName to={`${comment.user.username}`}>@{comment.user.username}</CommentCardAuthorName>
                 <p>
                   {new Date(comment.comment.createdAt).toLocaleTimeString()}
                 </p>
@@ -49,7 +50,7 @@ const CommentCardContainer = styled.div`
   margin-top: 1em;
 `;
 
-const CommentCardImage = styled.div`
+const CommentCardImage = styled(Link)`
   width: 30px;
   aspect-ratio: 1;
   border-radius: 50%;
@@ -65,7 +66,7 @@ const CommentCardAuthor = styled.div`
   justify-content: space-between;
 `;
 
-const CommentCardAuthorName = styled.p`
+const CommentCardAuthorName = styled(Link)`
   color: var(--primary--color-400);
 `;
 

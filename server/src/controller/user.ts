@@ -30,6 +30,7 @@ const getUser = async (req: Request, res: Response) => {
 const getUserByName = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
+    console.log(username);
 
     if (!username) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -38,7 +39,7 @@ const getUserByName = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username }).exec();
 
     if (!user) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -46,12 +47,11 @@ const getUserByName = async (req: Request, res: Response) => {
         message: "User doesn't exit!",
       });
     }
-
-    const { password, __v, ...otherInfo } = user;
+    const { password, ...other } = user.toObject();
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
-      user: otherInfo,
+      user: other,
     });
   } catch (error) {
     return res.status(StatusCodes.BAD_REQUEST).json({
@@ -148,7 +148,8 @@ const editUser = async (req: Request, res: Response) => {
 // Follow User
 const followUser = async (req: Request, res: Response) => {
   const { username } = req.params;
-  const id = req.user as ObjectId;
+  const id = req.user;
+
   try {
     const userToFollow = await User.findOne({ username });
 
@@ -165,7 +166,7 @@ const followUser = async (req: Request, res: Response) => {
       res,
     });
 
-    await userToFollow?.updateOne({ $push: { request: id } });
+    await userToFollow.updateOne({ $push: { request: id } });
 
     return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
@@ -241,7 +242,7 @@ const acceptRequest = async (req: Request, res: Response) => {
 // Decline Request
 const declineRequest = async (req: Request, res: Response) => {
   const id = req.user;
-  const {userToAcceptId }= req.params;
+  const { userToAcceptId } = req.params;
 
   try {
     const userToAccept = await User.findOne({ _id: userToAcceptId });

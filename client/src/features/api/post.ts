@@ -22,6 +22,11 @@ export const postApi = createApi({
             ]
           : ["Post"],
     }),
+    getUserPost: builder.query({
+      query: (username) => ({
+        url: `/post/personal/${username}`,
+      }),
+    }),
     post: builder.mutation<Partial<IPost>, IPostPayload>({
       query: (postPaylod) => ({
         url: "/post",
@@ -49,6 +54,7 @@ export const postApi = createApi({
 
 export const {
   useGetPostQuery,
+  useGetUserPostQuery,
   usePostMutation,
   useUpdatePostMutation,
   useLikeOrUnlikePostMutation,

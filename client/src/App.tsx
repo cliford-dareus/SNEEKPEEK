@@ -64,7 +64,7 @@ function App() {
 
         <Route path='/' element={<Layout />}>
           <Route element={<PrivateOutlet />}>
-            <Route path="profile" element={<Profile />} />
+            <Route path=":name" element={<Profile />} />
           </Route>
 
           <Route path="/" element={<DashboardLayout />}>
