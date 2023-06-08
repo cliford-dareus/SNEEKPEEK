@@ -1,36 +1,39 @@
 import { Flex } from "../../lib/styled-component/styles";
 import styled from "styled-components";
-import SideContent from '../SideContent'
+import SideContent from "../SideContent";
 import Explore from "../../pages/Home";
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../../lib/hooks/useAuth";
 import { useGetUserByUsernameQuery } from "../../features/api/user";
 
-
 const index = () => {
-  const auth = useAuth()
-  const { data: currentUser } = useGetUserByUsernameQuery(auth.user?.username);
+  const auth = useAuth();
+  const { data: currentUser } = useGetUserByUsernameQuery(
+    auth?.user?.username,
+    { skip: auth.user?.username === "" }
+  );
+
   return (
     <DashboardLayoutContainer>
       <Flex style={{ height: "100%", gap: "1em" }}>
         <Explore />
         <SideContent>
           <SideContentMenu>
-              <li>
-                <SideContntBtn to="." data-active="true">
-                  Messages
-                </SideContntBtn>
-              </li>
-              <li>
-                <SideContntBtn to="mention">Mentions</SideContntBtn>
-              </li>
-              <li>
-                <SideContntBtn to="request">Requests</SideContntBtn>
-              </li>
-            </SideContentMenu>
-            <div>
-              <Outlet context={{ user: currentUser?.user }}/>
-            </div>
+            <li>
+              <SideContntBtn to="." data-active="true">
+                Messages
+              </SideContntBtn>
+            </li>
+            <li>
+              <SideContntBtn to="mention">Mentions</SideContntBtn>
+            </li>
+            <li>
+              <SideContntBtn to="request">Requests</SideContntBtn>
+            </li>
+          </SideContentMenu>
+          <div>
+            <Outlet context={{ user: currentUser?.user }} />
+          </div>
         </SideContent>
       </Flex>
     </DashboardLayoutContainer>
@@ -63,5 +66,3 @@ const SideContntBtn = styled(Link)`
     border-bottom: 2px solid white;
   }
 `;
-
-
