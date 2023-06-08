@@ -29,7 +29,7 @@ export interface IUserData {
 }
 
 export interface IUserDataResponse {
-  data: IUserData;
+  user: IUserData;
   status: number;
 }
 

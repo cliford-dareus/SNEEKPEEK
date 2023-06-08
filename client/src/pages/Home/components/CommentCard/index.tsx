@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useGetPostWithCommentQuery } from "../../../../features/api/comment";
-import Loader from '../../../../components/UI/Loader'
+import Loader from "../../../../components/UI/Loader";
 import { Link } from "react-router-dom";
 
 const index = ({ postId }: { postId: string }) => {
@@ -17,7 +17,9 @@ const index = ({ postId }: { postId: string }) => {
 
             <CommentCardContent>
               <CommentCardAuthor>
-                <CommentCardAuthorName to={`${comment.user.username}`}>@{comment.user.username}</CommentCardAuthorName>
+                <CommentCardAuthorName to={`${comment.user.username}`}>
+                  @{comment.user.username}
+                </CommentCardAuthorName>
                 <p>
                   {new Date(comment.comment.createdAt).toLocaleTimeString()}
                 </p>
@@ -30,7 +32,7 @@ const index = ({ postId }: { postId: string }) => {
           </CommentCardContainer>
         ))
       ) : (
-        <div style={{ width: '50px', height: '50px'}}>
+        <div style={{ width: "50px", height: "50px" }}>
           <Loader />
         </div>
       )}
@@ -41,7 +43,7 @@ const index = ({ postId }: { postId: string }) => {
 export default index;
 
 const CommentCardContainer = styled.div`
-  padding: .5em 1em;
+  padding: 0.5em 1em;
   background-color: var(--dark--color-900);
   border-radius: 10px;
   display: flex;
@@ -71,7 +73,7 @@ const CommentCardAuthorName = styled(Link)`
 `;
 
 const CommentCardText = styled.div`
-  p{
-    font-size: .85rem;
+  p {
+    font-size: 0.85rem;
   }
 `;

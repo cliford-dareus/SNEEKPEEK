@@ -25,9 +25,12 @@ const index = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = await createPost(post).unwrap()
-    console.log(data);
-
+    try {
+      await createPost(post).unwrap();
+      setPost({ content: "", image: "" });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

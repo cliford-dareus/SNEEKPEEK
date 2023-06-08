@@ -2,8 +2,27 @@ import { FC } from "react";
 import { IRequestData } from "../../../utils/types/types";
 import styled from "styled-components";
 import { RiUserFollowLine, RiUserUnfollowLine } from "react-icons/ri";
+import { useAcceptRequestMutation } from "../../../features/api/user";
 
 const index: FC<{ req: IRequestData }> = ({ req }) => {
+  const [accept] = useAcceptRequestMutation();
+
+  const handleAcccept = async (id: string) => {
+    try {
+      await accept(id);
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    try {
+      console.log(id)
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
   return (
     <div>
       <RequestContainer>
@@ -11,10 +30,10 @@ const index: FC<{ req: IRequestData }> = ({ req }) => {
         <RequestContent>{req.username}</RequestContent>
 
         <RequestActions>
-          <span>
+          <span onClick={() => handleAcccept(req._id)}>
             <RiUserFollowLine />
           </span>
-          <span>
+          <span onClick={() => handleReject(req._id)}>
             <RiUserUnfollowLine />
           </span>
         </RequestActions>
@@ -43,30 +62,30 @@ const RequestContainer = styled.div`
 `;
 
 const RequestContent = styled.p`
- margin-right: auto;
+  margin-right: auto;
 `;
 
 const RequestActions = styled.div`
+  display: flex;
+  align-items: center;
+
+  span {
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 30px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    margin-left: 1em;
+    font-size: 1.15rem;
+    cursor: pointer;
+  }
 
-    span{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 30px;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        margin-left: 1em;
-        font-size: 1.15rem;
-    }
+  span:nth-of-type(1) {
+    background-color: green;
+  }
 
-    span:nth-of-type(1){
-        background-color: green;
-    }
-
-    span:nth-of-type(2){
-        background-color: red;
-    }
-
+  span:nth-of-type(2) {
+    background-color: red;
+  }
 `;

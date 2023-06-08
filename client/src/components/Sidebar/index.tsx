@@ -9,8 +9,11 @@ import {
 } from "react-icons/bs";
 import UserProfile from "../../assets/user.jpg";
 import { Flex } from "../../lib/styled-component/styles";
+import { useAppSelector } from "../../app/hooks";
+import { RootState } from "../../app/store";
 
 const index = () => {
+  const user = useAppSelector((state: RootState) => state.auth.user?.username )
   return (
     <SidebarContainer>
       <Navigation>
@@ -30,7 +33,7 @@ const index = () => {
             </NavigationLink>
           </NavigationListItem>
           <NavigationListItem>
-            <NavigationLink to="/profile">
+            <NavigationLink to={`${user}`}>
               <Icon>
                 <BsPeople />
               </Icon>
@@ -41,7 +44,7 @@ const index = () => {
 
       <SideContentContainer>
         <SideContentActivity>
-          <h2>Activities</h2>
+          <h2>Activity</h2>
 
           <SideActivity>
             <Flex>
@@ -168,11 +171,15 @@ const SideContentContainer = styled.div`
 const SideContentActivity = styled.div`
   width: 100%;
   /* border-bottom: 1px solid; */
+  h2{
+    font-weight: 600;
+    font-size: 1.333rem;
+  }
 `;
 
 const SideContentSubTitle = styled.span`
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 600;
   margin-right: auto;
 `;
 
@@ -210,12 +217,11 @@ const SideContentActivityCardText = styled.div`
   margin-right: auto;
 
   span {
-    font-size: 0.9rem;
-    font-weight: bold;
+    font-weight: 600;
   }
 
   p {
-    font-size: 0.825rem;
+    font-size: 0.86rem;
   }
 `;
 

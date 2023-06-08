@@ -104,7 +104,8 @@ export const PageTitle = styled.div`
   background-color: var(--dark--color-800);
 
   h1 {
-    font-size: 1.7rem;
+    font-size: 1.333rem;
+    font-weight: 600;
   }
 `;
 

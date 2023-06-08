@@ -9,7 +9,7 @@ import ProfileTags from "./pages/Profile/Tags";
 
 import Profile from "./pages/Profile";
 import Message from "./components/SideContent/messages";
-import Mention from "./components/SideContent/mentions";
+import Trending from "./components/SideContent/trending";
 import Request from "./components/SideContent/request";
 import DashboardLayout from "./components/DashboardLayout";
 import { GlobalStyles } from "./lib/styled-component/globalStyles";
@@ -43,8 +43,9 @@ function App() {
   }, [refresh, removeCredentials]);
 
   useEffect(() => {
+    if(auth.token === '') return
     refreshAccessToken();
-  }, [refreshAccessToken]);
+  }, [refreshAccessToken, auth.token]);
 
   useEffect(() => {
     let refreshAccessTokenTimerId: any;
@@ -80,8 +81,8 @@ function App() {
           </Route>
 
           <Route path="/" element={<DashboardLayout />}>
-            <Route index element={<Message />} />
-            <Route path="mention" element={<Mention />} />
+            <Route index element={<Trending />} />
+            <Route path="message" element={<Message />} />
             <Route path="request" element={<Request />} />
           </Route>
         </Route>

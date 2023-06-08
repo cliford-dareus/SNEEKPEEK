@@ -38,9 +38,15 @@ const index = () => {
             <img src="" alt="" />
           </ProfileBanner>
 
-          <ProfileBtn onClick={onFollowUser}>
-            <Button label="Follow" isLoading={false} color={false} />
-          </ProfileBtn>
+          {name !== user ? (
+            <ProfileBtn onClick={onFollowUser}>
+              <Button label="Follow" isLoading={false} color={false} />
+            </ProfileBtn>
+          ) : (
+            <ProfileBtn>
+              <Button label="Set up profile" isLoading={false} color={false} />
+            </ProfileBtn>
+          )}
 
           <ProfileDetails>
             <div>
@@ -68,9 +74,12 @@ const index = () => {
                   <span>followers</span>
                 </div>
                 <div>
-                  <span>{currentUser?.user.followingsLength == null
+                  <span>
+                    {currentUser?.user.followingsLength == null
                       ? 0
-                      : currentUser?.user.followingsLength}</span> <span>followings</span>
+                      : currentUser?.user.followingsLength}
+                  </span>{" "}
+                  <span>followings</span>
                 </div>
               </ProfileStats>
             </div>
@@ -104,7 +113,7 @@ const index = () => {
 
           <div>
             <div>
-              <Outlet context={{user: currentUser?.user}}/>
+              <Outlet context={{ user: currentUser?.user }} />
             </div>
           </div>
         </ProfileContent>

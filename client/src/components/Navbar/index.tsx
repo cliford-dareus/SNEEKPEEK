@@ -3,8 +3,25 @@ import styled from "styled-components";
 import SneekLogo from "../../assets/Sneekpeek.svg";
 import { BsSearch, BsChat, BsBell, BsChevronDown } from "react-icons/bs";
 import Profile from "../../assets/user.jpg";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { RootState } from "../../app/store";
+import { useSignOutUserMutation } from "../../features/api/auth";
+import { removeCredentials } from "../../features/slice/authSlice";
 
 const index = () => {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state: RootState) => state.auth);
+  const [signout] = useSignOutUserMutation();
+
+  const handleSignout = async () => {
+    try {
+      await signout({});
+      await dispatch(removeCredentials());
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Header>
       <LogoContainer to="/">
@@ -28,8 +45,8 @@ const index = () => {
 
         <HeaderProfileContainer>
           <img src={Profile} alt="" />
-          <p>Harry_webert</p>
-          <Icon>
+          <p>{user.user?.username}</p>
+          <Icon onClick={handleSignout}>
             <BsChevronDown />
           </Icon>
         </HeaderProfileContainer>
@@ -74,8 +91,6 @@ const HeaderInputContainer = styled.div`
   @media screen and (min-width: 1035px) {
     margin-left: 17.5em;
   }
-
-
 `;
 
 const LogoContainer = styled(Link)`
@@ -125,6 +140,10 @@ const HeaderProfileContainer = styled.div`
 
   p {
     display: none;
+    max-width: 25ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     @media screen and (min-width: 435px) {
       display: block;

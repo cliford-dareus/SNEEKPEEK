@@ -116,12 +116,50 @@ const signIn = async (req: Request, res: Response) => {
         expiresAt: new Date(Date.now() + ms("15m")),
       },
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).send({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
 };
 
 //Sign Out
 const signOut = async (req: Request, res: Response) => {
-  
+  try {
+    const userId = req.user;
+
+    const user = await User.findById(userId);
+    console.log(user);
+
+    if (!user) {
+      return res.status(StatusCodes.BAD_REQUEST).send({
+        status: StatusCodes.BAD_REQUEST,
+        message: ReasonPhrases.BAD_REQUEST,
+      });
+    }
+
+    await Token.findOneAndUpdate(
+      { userId: user._id },
+      { refreshToken: "", expirationTime: "" }
+    );
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: false,
+      signed: true,
+    })
+
+    res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: "User logged out",
+    });
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).send({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
 };
 
 //RefreshToken
@@ -172,7 +210,10 @@ const refreshTokenFn = async (req: Request, res: Response) => {
       res.status(StatusCodes.BAD_REQUEST);
     }
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST);
+    res.status(StatusCodes.BAD_REQUEST).send({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
   }
 };
 
@@ -196,7 +237,12 @@ const resetPassword = async (req: Request, res: Response) => {
         message: "Invalid credentials",
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).send({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
 };
 
 export { signUp, signIn, signOut, refreshTokenFn, resetPassword };

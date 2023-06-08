@@ -1,6 +1,12 @@
 import styled from "styled-components";
 import { IPost } from "../../../utils/types/types";
-import { BsChatDots, BsFillHeartFill, BsHeart, BsTag } from "react-icons/bs";
+import {
+  BsChatDots,
+  BsFillHeartFill,
+  BsHeart,
+  BsTag,
+  BsThreeDots,
+} from "react-icons/bs";
 import CommentCard from "../../../pages/Home/components/CommentCard";
 import { FormEvent, useState } from "react";
 import { useAuth } from "../../../lib/hooks/useAuth";
@@ -9,6 +15,7 @@ import { usePostCommentMutation } from "../../../features/api/comment";
 import { useLikeOrUnlikePostMutation } from "../../../features/api/post";
 import { getElaspeTime } from "../../../utils/functions/elaspeTime";
 import { Link } from "react-router-dom";
+import { Flex } from "../../../lib/styled-component/styles";
 
 const index = ({ post }: { post: IPost }) => {
   const auth = useAuth();
@@ -38,10 +45,16 @@ const index = ({ post }: { post: IPost }) => {
       </CardImage>
 
       <CardContent>
-        <Link to={`${post.author.username}`} style={{ color: "inherit" }}>
-          <p>{post.author.username}</p>
-          <CardDate>{getElaspeTime(post.createdAt)} ago</CardDate>
-        </Link>
+        <CardContentTop>
+          <Link to={`${post.author.username}`} style={{ color: "inherit" }}>
+            <CardName>{post.author.username}</CardName>
+            <CardDate>{getElaspeTime(post.createdAt)} ago</CardDate>
+          </Link>
+
+          <span>
+            <BsThreeDots />
+          </span>
+        </CardContentTop>
 
         <div>
           <p>{post.content}</p>
@@ -148,10 +161,17 @@ const CardContent = styled.div`
   flex-direction: column;
 `;
 
+const CardContentTop = styled(Flex)`
+  justify-content: space-between;
+`;
+
+const CardName = styled.p`
+  font-weight: 600;
+`;
+
 const CardDate = styled.span`
   color: var(--light--color-400);
   display: block;
-  font-size: 0.85rem;
   line-height: 0.9;
   margin-bottom: 1em;
 `;

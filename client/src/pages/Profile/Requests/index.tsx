@@ -1,16 +1,17 @@
-import { Link, useOutletContext } from "react-router-dom"
-import { useAcceptRequestMutation } from "../../../features/api/user";
+import { useOutletContext } from "react-router-dom";
+import RequestCard from "../../../components/UI/RequestCard";
+import { IRequestData } from "../../../utils/types/types";
 
 const index = () => {
-  const [accept] = useAcceptRequestMutation()
-  const { user } =useOutletContext() as any;
-
+  const { user } = useOutletContext() as any;
 
   return (
-    <div>{user.request.map((req: any) => (
-      <button onClick={() => accept(req._id)}>{req.username}</button>
-    ))}</div>
-  )
-}
+    <div>
+      {user?.request.map((req: IRequestData) => (
+        <RequestCard req={req} />
+      ))}
+    </div>
+  );
+};
 
-export default index
+export default index;

@@ -21,11 +21,11 @@ const index = () => {
           <SideContentMenu>
             <li>
               <SideContntBtn to="." data-active="true">
-                Messages
+                Trending
               </SideContntBtn>
             </li>
             <li>
-              <SideContntBtn to="mention">Mentions</SideContntBtn>
+              <SideContntBtn to="message">Messages</SideContntBtn>
             </li>
             <li>
               <SideContntBtn to="request">Requests</SideContntBtn>
@@ -60,7 +60,7 @@ const SideContntBtn = styled(Link)`
   padding: 0.3em 0;
   color: white;
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 600;
 
   &[data-active="true"] {
     border-bottom: 2px solid white;

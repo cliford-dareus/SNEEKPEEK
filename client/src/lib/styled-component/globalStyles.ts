@@ -40,6 +40,7 @@ export const GlobalStyles = createGlobalStyle`
         background-color: var(--dark--color-900);
         color: var(--txt--color-100);
         scroll-behavior: smooth;
+        font-size: 15px;
     }
 
     ul{

@@ -34,10 +34,10 @@ const index = () => {
         return;
       }
 
-      const { data } = await loginUser(userInfo).unwrap();
-      navigate("/", {replace: true});
-      // setUserInfo({ username: "", password: "" });
-      dispatch(setCredentials(data));
+      const data = await loginUser(userInfo).unwrap();
+      setUserInfo({ username: "", password: "" });
+      dispatch(setCredentials(data.user));
+      navigate("/", { replace: true });
     } catch (error) {}
   };
 
