@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import Loader from "../../components/Loader";
+import Loader from "../Loader";
 
 const index = ({
   label,
@@ -27,7 +27,7 @@ const index = ({
 export default index;
 
 interface BgProp {
-  readonly $bg: boolean;
+  readonly $bg: boolean | undefined;
 }
 
 const Button = styled.button<BgProp>`

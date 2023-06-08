@@ -1,4 +1,4 @@
-import Button from "../../Button";
+import Button from "../../UI/Button";
 import { IRegisterPayload } from "../../../utils/types/types";
 import { ChangeEvent, FormEvent, useState } from "react";
 import {

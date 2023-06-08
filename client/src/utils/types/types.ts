@@ -73,3 +73,8 @@ export interface IComment {
   updatedAt: string;
   __v: number;
 }
+
+export interface IRequestData {
+  _id: string;
+  username: string
+}

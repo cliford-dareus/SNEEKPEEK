@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useGetPostWithCommentQuery } from "../../../../features/api/comment";
-import Loader from '../../../../components/Loader'
+import Loader from '../../../../components/UI/Loader'
 import { Link } from "react-router-dom";
 
 const index = ({ postId }: { postId: string }) => {

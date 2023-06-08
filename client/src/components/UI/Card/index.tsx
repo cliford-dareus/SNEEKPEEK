@@ -1,13 +1,13 @@
 import styled from "styled-components";
-import { IPost } from "../../utils/types/types";
+import { IPost } from "../../../utils/types/types";
 import { BsChatDots, BsFillHeartFill, BsHeart, BsTag } from "react-icons/bs";
-import CommentCard from "../../pages/Home/components/CommentCard";
+import CommentCard from "../../../pages/Home/components/CommentCard";
 import { FormEvent, useState } from "react";
-import { useAuth } from "../../lib/hooks/useAuth";
+import { useAuth } from "../../../lib/hooks/useAuth";
 import Button from "../Button";
-import { usePostCommentMutation } from "../../features/api/comment";
-import { useLikeOrUnlikePostMutation } from "../../features/api/post";
-import { getElaspeTime } from "../../utils/functions/elaspeTime";
+import { usePostCommentMutation } from "../../../features/api/comment";
+import { useLikeOrUnlikePostMutation } from "../../../features/api/post";
+import { getElaspeTime } from "../../../utils/functions/elaspeTime";
 import { Link } from "react-router-dom";
 
 const index = ({ post }: { post: IPost }) => {

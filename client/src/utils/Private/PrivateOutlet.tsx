@@ -4,7 +4,8 @@ import { useAuth } from "../../lib/hooks/useAuth";
 export function PrivateOutlet() {
   const auth = useAuth();
   const location = useLocation();
-  // if (!auth.token) return;
+
+  if (!auth.token) return null;
 
   return auth?.token ? (
     <Outlet />

@@ -1,7 +1,12 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Layout from "./components/Layout";
+import ProfilePost from "./pages/Profile/Post";
+import ProfileRequest from "./pages/Profile/Requests";
+import ProfileLikes from "./pages/Profile/Likes";
+import ProfileTags from "./pages/Profile/Tags";
+
 import Profile from "./pages/Profile";
 import Message from "./components/SideContent/messages";
 import Mention from "./components/SideContent/mentions";
@@ -18,17 +23,19 @@ import { setCredentials } from "./features/slice/authSlice";
 
 function App() {
   const auth = useAuth();
-  const [refresh, { isLoading }] = useRefreshTokenMutation();
+  const [refresh] = useRefreshTokenMutation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const refreshAccessToken = useCallback(async () => {
     try {
       const data = await refresh({}).unwrap();
-
       if (data?.status === 204) {
         dispatch(removeCredentials());
+        navigate("/login");
       } else {
         dispatch(setCredentials(data?.user));
+        // navigate(".");
       }
     } catch (error) {
       dispatch(removeCredentials());
@@ -62,9 +69,14 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path='/' element={<Layout />}>
+        <Route path="/" element={<Layout />}>
           <Route element={<PrivateOutlet />}>
-            <Route path=":name" element={<Profile />} />
+            <Route path=":name" element={<Profile />}>
+              <Route index element={<ProfilePost />} />
+              <Route path="likes" element={<ProfileLikes />} />
+              <Route path="tags" element={<ProfileTags />} />
+              <Route path="requests" element={<ProfileRequest />} />
+            </Route>
           </Route>
 
           <Route path="/" element={<DashboardLayout />}>

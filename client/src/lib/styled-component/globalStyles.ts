@@ -39,6 +39,7 @@ export const GlobalStyles = createGlobalStyle`
         font-family: 'Poppins', sans-serif;
         background-color: var(--dark--color-900);
         color: var(--txt--color-100);
+        scroll-behavior: smooth;
     }
 
     ul{

@@ -10,7 +10,7 @@ export interface IUser extends Partial<Document>{
   image: string;
   request: ObjectId[];
   followers: ObjectId[];
-  following: ObjectId[];
+  followings: ObjectId[];
   followersLength: number;
   followingsLength: number;
 }

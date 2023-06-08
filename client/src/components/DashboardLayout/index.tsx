@@ -3,9 +3,13 @@ import styled from "styled-components";
 import SideContent from '../SideContent'
 import Explore from "../../pages/Home";
 import { Link, Outlet } from "react-router-dom";
+import { useAuth } from "../../lib/hooks/useAuth";
+import { useGetUserByUsernameQuery } from "../../features/api/user";
 
 
 const index = () => {
+  const auth = useAuth()
+  const { data: currentUser } = useGetUserByUsernameQuery(auth.user?.username);
   return (
     <DashboardLayoutContainer>
       <Flex style={{ height: "100%", gap: "1em" }}>
@@ -25,7 +29,7 @@ const index = () => {
               </li>
             </SideContentMenu>
             <div>
-              <Outlet />
+              <Outlet context={{ user: currentUser?.user }}/>
             </div>
         </SideContent>
       </Flex>

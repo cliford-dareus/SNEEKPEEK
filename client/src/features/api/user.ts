@@ -33,7 +33,14 @@ export const userApi = createApi({
         method: "POST",
       }),
     }),
+    acceptRequest: builder.mutation({
+      query: (userId) => ({
+        url: `/user/accept-request/${userId}`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['User']
+    })
   }),
 });
 
-export const { useGetUserByUsernameQuery, useFollowUserMutation } = userApi;
+export const { useGetUserByUsernameQuery, useFollowUserMutation, useAcceptRequestMutation } = userApi;

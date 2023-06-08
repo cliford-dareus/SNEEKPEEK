@@ -3,30 +3,28 @@ import {
   PageContainer,
   PageTitle,
 } from "../../lib/styled-component/styles";
-// import { useAppSelector } from "../../app/hooks";
+import { useAppSelector } from "../../app/hooks";
 import SideContent from "../../components/SideContent";
 import styled from "styled-components";
-import Button from "../../components/Button";
-import { useParams } from "react-router-dom";
-import { useFollowUserMutation, useGetUserByUsernameQuery } from "../../features/api/user";
-import { useGetUserPostQuery } from "../../features/api/post";
-import Card from "../../components/Card";
-import Loader from "../../components/Loader";
+import Button from "../../components/UI/Button";
+import { Link, Outlet, useParams } from "react-router-dom";
+import {
+  useFollowUserMutation,
+  useGetUserByUsernameQuery,
+} from "../../features/api/user";
+import { RootState } from "../../app/store";
 
 const index = () => {
   const { name } = useParams();
-  const { data: currentUser } = useGetUserByUsernameQuery(name);
-  const { data: post, isLoading } = useGetUserPostQuery(name);
-  // const user = useAppSelector((state) => state.auth.user?.username);
   const [followUser] = useFollowUserMutation();
+  const { data: currentUser } = useGetUserByUsernameQuery(name);
+  const user = useAppSelector((state: RootState) => state.auth.user?.username);
 
-  const onFollowUser =async () => {
+  const onFollowUser = async () => {
     try {
-      await followUser({username: name})
-    } catch (error) {
-      
-    }
-  }
+      await followUser({ username: name });
+    } catch (error) {}
+  };
 
   return (
     <div style={{ flex: "1", display: "flex", gap: "1em" }}>
@@ -41,7 +39,7 @@ const index = () => {
           </ProfileBanner>
 
           <ProfileBtn onClick={onFollowUser}>
-            <Button label="Follow" isLoading={false} color={false}/>
+            <Button label="Follow" isLoading={false} color={false} />
           </ProfileBtn>
 
           <ProfileDetails>
@@ -63,14 +61,16 @@ const index = () => {
               <ProfileStats>
                 <div>
                   <span>
-                    {currentUser?.user.followesLength == null
+                    {currentUser?.user.followersLength == null
                       ? 0
-                      : currentUser?.user.followesLength}{" "}
-                  </span>{" "}
+                      : currentUser?.user.followersLength}
+                  </span>
                   <span>followers</span>
                 </div>
                 <div>
-                  <span>1.3k </span> <span>followings</span>
+                  <span>{currentUser?.user.followingsLength == null
+                      ? 0
+                      : currentUser?.user.followingsLength}</span> <span>followings</span>
                 </div>
               </ProfileStats>
             </div>
@@ -86,19 +86,25 @@ const index = () => {
 
         <ProfileContent>
           <ProfileActions>
-            <li>Post</li>
-            <li>Likes</li>
-            <li>Tag</li>
-            <li>Requests</li>
+            <li>
+              <Link to=".">Post</Link>
+            </li>
+            <li>
+              <Link to="likes">Likes</Link>{" "}
+            </li>
+            <li>
+              <Link to="tags">Tags</Link>{" "}
+            </li>
+            {name == user && (
+              <li>
+                <Link to="requests">Requests</Link>
+              </li>
+            )}
           </ProfileActions>
 
           <div>
             <div>
-              {!isLoading ? (
-                post?.post.map((post: any) => <Card post={post} />)
-              ) : (
-                <Loader />
-              )}
+              <Outlet context={{user: currentUser?.user}}/>
             </div>
           </div>
         </ProfileContent>
@@ -174,11 +180,20 @@ const ProfileBtn = styled.div`
 
 const ProfileActions = styled.ul`
   display: flex;
-  padding: 1em;
+  padding: 1em 4em;
+  align-content: center;
   background-color: var(--dark--color-800);
-  justify-content: space-between;
+  justify-content: space-around;
 `;
 
 const ProfileContent = styled.div`
   margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const LoaderContainer = styled.div`
+  width: 50px;
+  height: 60px;
+  margin: 2em auto;
 `;

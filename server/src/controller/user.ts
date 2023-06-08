@@ -39,7 +39,10 @@ const getUserByName = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findOne({ username }).exec();
+    const user = await User.findOne({ username })
+      .populate("request", ["_id", "username", "image"])
+      .populate("followers", ["_id", "username", "image"])
+      .populate("followings", ["_id", "username", "image"]);
 
     if (!user) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -47,7 +50,7 @@ const getUserByName = async (req: Request, res: Response) => {
         message: "User doesn't exit!",
       });
     }
-    const { password, ...other } = user.toObject();
+    const { password, __v, email, ...other } = user.toObject();
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
@@ -161,7 +164,7 @@ const followUser = async (req: Request, res: Response) => {
     }
 
     checkUserIdentity({
-      userTofollowId: userToFollow._id,
+      userTofollowId: String(userToFollow._id),
       currentUserId: id,
       res,
     });
@@ -187,6 +190,7 @@ const acceptRequest = async (req: Request, res: Response) => {
   const id = req.user;
   const { userToAcceptId } = req.params;
 
+  
   try {
     const userToAccept = await User.findOne({ _id: userToAcceptId });
     if (!userToAccept) {
@@ -195,13 +199,13 @@ const acceptRequest = async (req: Request, res: Response) => {
         message: "User doesn't exist",
       });
     }
-
+    
     checkUserIdentity({
-      userTofollowId: userToAccept._id,
+      userTofollowId: String(userToAccept._id),
       currentUserId: id,
       res,
     });
-
+    
     const currentUser = await User.findOne({ _id: id });
     if (!currentUser) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -210,6 +214,7 @@ const acceptRequest = async (req: Request, res: Response) => {
       });
     }
 
+    
     if (!currentUser.request.includes(userToAccept._id)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
@@ -217,15 +222,19 @@ const acceptRequest = async (req: Request, res: Response) => {
       });
     }
 
+    
     await currentUser.updateOne({
       $push: { followers: userToAccept._id },
       $pull: { request: userToAccept._id },
-      $inc: { followers: 1 },
+      $inc: { followersLength: 1 },
     });
-
+    
     await userToAccept.updateOne({
-      $push: { following: currentUser._id },
+      $push: { followings: currentUser._id },
+      $inc: {followingsLength: 1}
     });
+    
+    console.log('USER ID 3' + userToAcceptId)
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
@@ -254,7 +263,7 @@ const declineRequest = async (req: Request, res: Response) => {
     }
 
     checkUserIdentity({
-      userTofollowId: userToAccept._id,
+      userTofollowId: String(userToAccept._id),
       currentUserId: id,
       res,
     });

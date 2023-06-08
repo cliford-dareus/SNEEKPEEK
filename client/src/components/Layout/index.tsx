@@ -3,7 +3,10 @@ import Sidebar from "../Sidebar";
 import Navbar from "../Navbar";
 import styled from "styled-components";
 
+
 const index = () => {
+  
+
   return (
     <Container>
       <Navbar />

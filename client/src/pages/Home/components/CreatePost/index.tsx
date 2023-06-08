@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { BsImage } from "react-icons/bs";
-import Button from "../../../../components/Button";
+import Button from "../../../../components/UI/Button";
 import CreatePostModal from "./CreatePostModal";
 import Label from "./Label";
 import React, { FormEvent, useState } from "react";

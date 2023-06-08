@@ -3,8 +3,8 @@ import { StatusCodes } from "http-status-codes";
 import { ObjectId } from "mongoose";
 
 interface Ipayload {
-  userTofollowId: ObjectId;
-  currentUserId: ObjectId;
+  userTofollowId: string;
+  currentUserId: string;
   res: Response;
 }
 
