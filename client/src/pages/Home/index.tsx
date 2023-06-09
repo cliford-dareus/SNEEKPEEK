@@ -5,10 +5,11 @@ import { IPost } from "../../utils/types/types";
 import Card from "../../components/UI/Card";
 import Featured from "./components/CreatePost";
 import { useAuth } from "../../lib/hooks/useAuth";
+// import { motion } from "framer-motion";
 
 const index = () => {
   const auth = useAuth();
-  const { data, isLoading, isError } = useGetPostQuery("");
+  const { data, isLoading, isError, refetch } = useGetPostQuery("");
 
   const sortedData = () => {
     const dataCopy = data?.post.slice();
@@ -26,7 +27,7 @@ const index = () => {
 
       <div>{auth.token && <Featured />}</div>
 
-      {isError? <h2>Error Baby</h2>: null}
+      {isError ? <h2>Error Baby</h2> : null}
 
       <div>
         {!isLoading ? (

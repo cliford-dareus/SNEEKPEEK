@@ -43,7 +43,7 @@ function App() {
   }, [refresh, removeCredentials]);
 
   useEffect(() => {
-    if(auth.token === '') return
+    // if(auth.token === '') return
     refreshAccessToken();
   }, [refreshAccessToken, auth.token]);
 

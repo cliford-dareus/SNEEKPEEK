@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import styled from "styled-components";
 
 export const Flex = styled.div`
@@ -9,10 +10,11 @@ export const FlexCol = styled.div`
   flex-direction: column;
 `;
 
-export const PageContainer = styled.div`
+export const PageContainer = styled(motion.div)`
   flex: 1;
   flex-shrink: 0;
   height: calc(100vh - 60px - 1em);
+  overscroll-behavior-y: contain;
   overflow-y: scroll;
   position: relative;
 
@@ -97,6 +99,7 @@ export const AuthPageImageContainer = styled.div`
 export const PageTitle = styled.div`
   width: 100%;
   padding: 1em;
+  line-height: .5;
   position: sticky;
   border-radius: 10px;
   z-index: 99999;

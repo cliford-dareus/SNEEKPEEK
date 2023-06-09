@@ -2,11 +2,20 @@ import { Flex } from "../../lib/styled-component/styles";
 import styled from "styled-components";
 import SideContent from "../SideContent";
 import Explore from "../../pages/Home";
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../lib/hooks/useAuth";
 import { useGetUserByUsernameQuery } from "../../features/api/user";
+import { useState } from "react";
+import { motion } from "framer-motion";
+
+const links = [
+  { id: 1, to: ".", title: "Trending" },
+  { id: 2, to: "message", title: "Messages" },
+  { id: 3, to: "request", title: "Requests" },
+];
 
 const index = () => {
+  const [activeTab, setActiveTab] = useState<number>(links[0].id);
   const auth = useAuth();
   const { data: currentUser } = useGetUserByUsernameQuery(
     auth?.user?.username,
@@ -19,17 +28,29 @@ const index = () => {
         <Explore />
         <SideContent>
           <SideContentMenu>
-            <li>
-              <SideContntBtn to="." data-active="true">
-                Trending
-              </SideContntBtn>
-            </li>
-            <li>
-              <SideContntBtn to="message">Messages</SideContntBtn>
-            </li>
-            <li>
-              <SideContntBtn to="request">Requests</SideContntBtn>
-            </li>
+            {links.map((link) => (
+              <li style={{ position: "relative" }}>
+                <SideContntBtn
+                  to={link.to}
+                  key={link.id}
+                  onClick={(isActive) =>
+                    isActive ? setActiveTab(link.id) : ""
+                  }
+                >
+                  {link.title}
+                  {activeTab == link.id && (
+                    <ActiveIndicator
+                      layoutId="Tab"
+                      transition={{
+                        type: "spring",
+                        bounce: 0.3,
+                        duration: 0.7,
+                      }}
+                    />
+                  )}
+                </SideContntBtn>
+              </li>
+            ))}
           </SideContentMenu>
           <div>
             <Outlet context={{ user: currentUser?.user }} />
@@ -54,15 +75,20 @@ const SideContentMenu = styled.ul`
   margin-bottom: 1em;
 `;
 
-const SideContntBtn = styled(Link)`
+const SideContntBtn = styled(NavLink)`
   outline: none;
   border: none;
   padding: 0.3em 0;
-  color: white;
   font-size: 1rem;
   font-weight: 600;
+  color: white;
+`;
 
-  &[data-active="true"] {
-    border-bottom: 2px solid white;
-  }
+const ActiveIndicator = styled(motion.div)`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: white;
 `;
