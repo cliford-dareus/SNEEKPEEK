@@ -1,23 +1,25 @@
+import { useCallback, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Layout from "./components/Layout";
 import ProfilePost from "./pages/Profile/Post";
 import ProfileRequest from "./pages/Profile/Requests";
 import ProfileLikes from "./pages/Profile/Likes";
 import ProfileTags from "./pages/Profile/Tags";
-
 import Profile from "./pages/Profile";
+import Messages from './pages/Messages'
+
+import { useAppDispatch } from "./app/hooks";
+import Layout from "./components/Layout";
 import Message from "./components/SideContent/messages";
 import Trending from "./components/SideContent/trending";
 import Request from "./components/SideContent/request";
 import DashboardLayout from "./components/DashboardLayout";
-import { GlobalStyles } from "./lib/styled-component/globalStyles";
 import { PrivateOutlet } from "./utils/Private/PrivateOutlet";
-import { useCallback, useEffect } from "react";
+import { GlobalStyles } from "./lib/styled-component/globalStyles";
 import { useAuth } from "./lib/hooks/useAuth";
 import { useRefreshTokenMutation } from "./features/api/auth";
-import { useAppDispatch } from "./app/hooks";
 import { removeCredentials } from "./features/slice/authSlice";
 import { setCredentials } from "./features/slice/authSlice";
 
@@ -46,10 +48,9 @@ function App() {
     // if(auth.token === '') return
     refreshAccessToken();
   }, [refreshAccessToken, auth.token]);
-
+  
   useEffect(() => {
     let refreshAccessTokenTimerId: any;
-
     if (auth.token) {
       refreshAccessTokenTimerId = setTimeout(() => {
         refreshAccessToken();
@@ -78,6 +79,7 @@ function App() {
               <Route path="tags" element={<ProfileTags />} />
               <Route path="requests" element={<ProfileRequest />} />
             </Route>
+            <Route path="messages" element={<Messages />}/>
           </Route>
 
           <Route path="/" element={<DashboardLayout />}>

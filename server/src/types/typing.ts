@@ -1,7 +1,14 @@
 import { Response } from "express";
 import { Document, Model, ObjectId } from "mongoose";
 
-export interface IUser extends Partial<Document>{
+// @MESSAGE
+export interface IMessage {
+  to: string;
+  from: string;
+}
+
+// @USER
+export interface IUser extends Partial<Document> {
   _id: ObjectId;
   name: string;
   username: string;
@@ -42,6 +49,35 @@ export interface IUserTokenPayLoad {
 export interface ICreateJwtPayLoad {
   payload: { user: UserToken; refreshToken?: string };
 }
-// export interface ISignUpPayload {
+
+// interface ISignUpPayload {
 //   name:
 // }
+
+// @POST
+export interface IPost {
+  author: ObjectId;
+  content: string;
+  image: string;
+  likes: ObjectId[];
+  comments: ObjectId[];
+  featured: boolean;
+}
+
+// @COMMENT
+export interface IComment {
+  author: ObjectId;
+  content: string;
+  likes: ObjectId[];
+}
+
+// @JWT
+export interface IJwtUser {
+  id: ObjectId;
+  refreshToken: string;
+  user: { username: string; userId: string };
+}
+
+export interface IAccessToken {
+  accessToken: string;
+}

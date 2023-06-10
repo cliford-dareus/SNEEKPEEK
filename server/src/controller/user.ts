@@ -2,7 +2,6 @@ import { User } from "../models/User";
 import { Request, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { checkUserIdentity } from "../utils/checkUserIdentity";
-import { ObjectId } from "mongoose";
 
 // Get User by id
 const getUser = async (req: Request, res: Response) => {

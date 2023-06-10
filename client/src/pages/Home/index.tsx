@@ -5,11 +5,13 @@ import { IPost } from "../../utils/types/types";
 import Card from "../../components/UI/Card";
 import Featured from "./components/CreatePost";
 import { useAuth } from "../../lib/hooks/useAuth";
+import { useEffect } from "react";
+import { socketConnect } from "../../lib/socket/config";
 // import { motion } from "framer-motion";
 
 const index = () => {
   const auth = useAuth();
-  const { data, isLoading, isError, refetch } = useGetPostQuery("");
+  const { data, isLoading, isError } = useGetPostQuery("");
 
   const sortedData = () => {
     const dataCopy = data?.post.slice();
@@ -18,6 +20,12 @@ const index = () => {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   };
+
+  useEffect(() => {
+    if(auth){
+      socketConnect(auth)
+    }
+  }, [auth])
 
   return (
     <PageContainer>

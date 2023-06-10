@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
-import { IComment } from "../types/comment.type";
-// import { IPost } from "../types/post.type";
+import { IComment } from "../types/typing";
 
 const CommentSchema = new mongoose.Schema(
   {

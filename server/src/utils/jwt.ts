@@ -1,13 +1,8 @@
 import ms from "ms";
 import jwt from "jsonwebtoken";
-import { IJwtUser } from "../types/jwt";
-import {
-  ICreateJwtPayLoad,
-  IUserTokenPayLoad,
-  UserToken,
-} from "../types/user.type";
 import { Request, Response } from "express";
 import { Token } from "../models/Token";
+import { ICreateJwtPayLoad, IJwtUser, IUserTokenPayLoad, UserToken } from "../types/typing";
 
 export const jwtVerify = ({ payload }: { payload: string }) => {
   return jwt.verify(payload, process.env.JWT_SECRET!) as IJwtUser;

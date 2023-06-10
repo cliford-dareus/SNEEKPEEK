@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { User } from "../models/User";
 import Comment from "../models/Comment";
+import { IComment } from "../types/typing";
+import { ObjectId } from "mongoose";
 
 //Create Post
 const createPost = async (req: Request, res: Response) => {
@@ -174,7 +176,6 @@ const getUserPost = async (req: Request, res: Response) => {
       status: StatusCodes.OK,
       post,
     });
-
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
@@ -195,7 +196,7 @@ const getPostwithCommment = async (req: Request, res: Response) => {
     }
 
     const comment = await Promise.all(
-      post.comments.map(async (ct) => {
+      post.comments.map(async (ct: ObjectId) => {
         const comment = await Comment.findById(ct);
 
         const user = await User.findById(comment?.author, {

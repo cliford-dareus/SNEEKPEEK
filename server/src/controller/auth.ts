@@ -10,8 +10,9 @@ import {
   createAccessToken,
   jwtVerify,
 } from "../utils/jwt";
-import { UserToken } from "../types/user.type";
+// import { UserToken } from "../types/user.type";
 import crypto from "crypto";
+import { UserToken } from "../types/typing";
 
 // Sign Up
 const signUp = async (req: Request, res: Response) => {

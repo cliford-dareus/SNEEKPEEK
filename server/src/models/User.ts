@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose, { Schema } from "mongoose";
 import validator from "validator";
-import { IUser, IUserMethod, UserModel } from "../types/user.type";
+import { IUser, IUserMethod, UserModel } from "../types/typing";
 
 const UserSchema = new Schema<IUser, UserModel, IUserMethod>(
   {
