@@ -1,6 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { authApi } from "../features/api/auth";
+
 import authReducer from "../features/slice/authSlice";
+import messageReducer from '../features/slice/messageSlice';
+
+import { authApi } from "../features/api/auth";
 import { postApi } from "../features/api/post";
 import { commentApi } from "../features/api/comment";
 import { userApi } from "../features/api/user";
@@ -12,6 +15,7 @@ export const store = configureStore({
     [commentApi.reducerPath]: commentApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     auth: authReducer,
+    messages: messageReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

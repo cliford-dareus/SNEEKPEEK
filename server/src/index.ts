@@ -33,8 +33,22 @@ app.use("/api/v1/user", userRouter);
 
 const PORT = process.env.PORT || 4000;
 
+interface IUser{
+  username: string;
+  userId: string
+}
+
 ioServer.use((socket, next) => {
   console.log(socket.handshake.auth)
+  const username = socket.handshake.auth.name
+  const userId = socket.handshake.auth.id
+
+  // @ts-ignore
+  socket.username = username
+    // @ts-ignore
+  socket.userId = userId
+
+  next()
 })
 
 IO(ioServer);

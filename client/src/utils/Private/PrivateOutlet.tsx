@@ -5,8 +5,6 @@ export function PrivateOutlet() {
   const auth = useAuth();
   const location = useLocation();
 
-  if (!auth.token) return null;
-
   return auth?.token ? (
     <Outlet />
   ) : (

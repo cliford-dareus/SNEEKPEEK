@@ -59,10 +59,10 @@ export interface IPost {
   __v: number;
 }
 
-export interface ILikes{
+export interface ILikes {
   _id: string;
   username: string;
-  createdAt: string
+  createdAt: string;
 }
 
 export interface IComment {
@@ -76,5 +76,5 @@ export interface IComment {
 
 export interface IRequestData {
   _id: string;
-  username: string
+  username: string;
 }

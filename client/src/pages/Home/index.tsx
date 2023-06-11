@@ -22,10 +22,10 @@ const index = () => {
   };
 
   useEffect(() => {
-    if(auth){
-      socketConnect(auth)
+    if (auth) {
+      socketConnect(auth);
     }
-  }, [auth])
+  }, [auth]);
 
   return (
     <PageContainer>

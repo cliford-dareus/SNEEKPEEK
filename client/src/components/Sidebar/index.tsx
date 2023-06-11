@@ -3,6 +3,7 @@ import styled from "styled-components";
 import {
   BsChat,
   BsHouse,
+  BsLightningCharge,
   BsPeople,
   BsPersonAdd,
   BsThreeDots,
@@ -26,7 +27,7 @@ const index = () => {
             </NavigationLink>
           </NavigationListItem>
           <NavigationListItem>
-            <NavigationLink to="/">
+            <NavigationLink to="messages">
               <Icon>
                 <BsChat />
               </Icon>
@@ -36,6 +37,13 @@ const index = () => {
             <NavigationLink to={`${user}`}>
               <Icon>
                 <BsPeople />
+              </Icon>
+            </NavigationLink>
+          </NavigationListItem>
+          <NavigationListItem>
+            <NavigationLink to=''>
+              <Icon>
+                <BsLightningCharge />
               </Icon>
             </NavigationLink>
           </NavigationListItem>
