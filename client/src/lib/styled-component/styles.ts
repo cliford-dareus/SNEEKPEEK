@@ -110,6 +110,10 @@ export const PageTitle = styled.div`
     font-size: 1.333rem;
     font-weight: 600;
   }
+
+  div:nth-of-type(2){
+    margin-top: 1em;
+  }
 `;
 
 export const Container = styled.div`

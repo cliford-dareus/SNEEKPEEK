@@ -39,8 +39,13 @@ export const userApi = createApi({
         method: 'POST',
       }),
       invalidatesTags: ['User']
+    }),
+    searchUser: builder.query({
+      query: (payload) => ({
+        url: `/user?username=${payload.searchTerm}`
+      })
     })
   }),
 });
 
-export const { useGetUserByUsernameQuery, useFollowUserMutation, useAcceptRequestMutation } = userApi;
+export const { useGetUserByUsernameQuery, useFollowUserMutation, useAcceptRequestMutation, useSearchUserQuery } = userApi;

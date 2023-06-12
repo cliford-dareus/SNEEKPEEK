@@ -4,15 +4,22 @@ import SideContent from "../../components/SideContent";
 import { selectCurrentUser } from "../../features/slice/authSlice";
 import { BsPlusCircle } from "react-icons/bs";
 import { useGetUserByUsernameQuery } from "../../features/api/user";
-// import { socket } from "../../lib/socket/config";
 import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
 import { InputContainer } from "../Chat";
+import { useGetConversationsQuery } from "../../features/api/conversations";
+import SearchModal from "../../components/UI/SearchModal";
+import { useEffect, useState } from "react";
 
 const index = () => {
   const user = useAppSelector(selectCurrentUser);
+  const { data: conversations, isLoading } = useGetConversationsQuery({});
   const { data: currentUserData } = useGetUserByUsernameQuery(
     user?.user?.username
   );
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  useEffect(() => {}, [searchTerm]);
 
   return (
     <div style={{ flex: "1", display: "flex", gap: "1em" }}>
@@ -24,9 +31,30 @@ const index = () => {
               <BsPlusCircle />
             </span>
           </InputContainer>
+
+          <InputContainer>
+            <p style={{ marginRight: "1em" }}>To: </p>
+            <Input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            {searchTerm ? <SearchModal data={{ searchTerm }} /> : ""}
+          </InputContainer>
         </PageTitle>
 
-        <div style={{ flex: "1" }}></div>
+        <div style={{ flex: "1" }}>
+          {!isLoading && conversations.length > 0 ? (
+            <div>
+              {conversations?.conversation.map((conversation: any) => (
+                <p>{conversation.lastmessage}</p>
+              ))}
+            </div>
+          ) : (
+            <div>New Message</div>
+          )}
+        </div>
       </PageContainer>
 
       {/* SIDECONTENT */}
@@ -51,12 +79,6 @@ const index = () => {
                       display: "flex",
                       justifyContent: "space-between",
                     }}
-                    onClick={() =>
-                      setReciepient({
-                        userId: follower._id,
-                        username: follower.username,
-                      })
-                    }
                   >
                     <p>{follower.username}</p>
                     <p>new</p>
@@ -78,12 +100,6 @@ const index = () => {
                       display: "flex",
                       justifyContent: "space-between",
                     }}
-                    onClick={() =>
-                      setReciepient({
-                        userId: follower._id,
-                        username: follower.username,
-                      })
-                    }
                   >
                     <p>{follower.username}</p>
                     <p>new</p>
@@ -111,4 +127,15 @@ const SideFriendInner = styled.div`
   p {
     font-weight: 600;
   }
+`;
+
+const Input = styled.input`
+  flex: 1;
+  outline: none;
+  border: none;
+  background-color: var(--dark--color-900);
+  font-size: 1rem;
+  padding: 0.5em 1em;
+  color: white;
+  border-radius: 10px;
 `;

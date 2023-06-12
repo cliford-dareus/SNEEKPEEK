@@ -4,7 +4,7 @@ import { useAppSelector } from "../../app/hooks";
 import { BsEmojiSmile, BsPlusCircle } from "react-icons/bs";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import Button from "../../components/UI/Button";
-import ReciepientModal from "../../components/UI/SearchPopup";
+import ReciepientModal from "../../components/UI/SearchModal";
 import SideContent from "../../components/SideContent";
 import { selectCurrentUser } from "../../features/slice/authSlice";
 import { useGetUserByUsernameQuery } from "../../features/api/user";

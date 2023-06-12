@@ -1,19 +1,18 @@
 import mongoose from "mongoose";
 import { IMessage } from "../types/typing";
 
-const MessageSchema = new mongoose.Schema(
+const MessagesSchema = new mongoose.Schema(
   {
-    from: {
+    conversationId: {
       type: mongoose.Types.ObjectId,
-      ref: "User",
+      ref: "Conversation",
     },
-    to: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
+    messages: {
+      type: [],
     },
   },
   { timestamps: true }
 );
 
-const Post = mongoose.model<IMessage>("Message", MessageSchema);
-export default Post;
+const Messages = mongoose.model<IMessage>("Messages", MessagesSchema);
+export default Messages;

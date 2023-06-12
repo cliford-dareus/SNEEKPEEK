@@ -18,6 +18,7 @@ import authRouter from "./router/auth";
 import postRouter from "./router/post";
 import commentRouter from "./router/comment";
 import userRouter from "./router/user";
+import conversationRouter from "./router/conversation";
 
 import connectDB from "./db/connect";
 
@@ -30,26 +31,27 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/post", postRouter);
 app.use("/api/v1/comment", commentRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/conversation", conversationRouter);
 
 const PORT = process.env.PORT || 4000;
 
-interface IUser{
+interface IUser {
   username: string;
-  userId: string
+  userId: string;
 }
 
 ioServer.use((socket, next) => {
-  console.log(socket.handshake.auth)
-  const username = socket.handshake.auth.name
-  const userId = socket.handshake.auth.id
+  console.log(socket.handshake.auth);
+  const username = socket.handshake.auth.name;
+  const userId = socket.handshake.auth.id;
 
   // @ts-ignore
-  socket.username = username
-    // @ts-ignore
-  socket.userId = userId
+  socket.username = username;
+  // @ts-ignore
+  socket.userId = userId;
 
-  next()
-})
+  next();
+});
 
 IO(ioServer);
 

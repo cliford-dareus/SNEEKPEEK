@@ -2,9 +2,21 @@ import { Response } from "express";
 import { Document, Model, ObjectId } from "mongoose";
 
 // @MESSAGE
+export interface IConversation {
+  users: ObjectId[];
+  messages: ObjectId;
+}
+
 export interface IMessage {
-  to: string;
-  from: string;
+  conservationId: ObjectId;
+  messages: { status: status.DELIVERED; content: string; sender: string }[];
+}
+
+enum status {
+  READ,
+  RECIEVE,
+  SEEN,
+  DELIVERED,
 }
 
 // @USER

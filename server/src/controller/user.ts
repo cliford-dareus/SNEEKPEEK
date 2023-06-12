@@ -49,6 +49,7 @@ const getUserByName = async (req: Request, res: Response) => {
         message: "User doesn't exit!",
       });
     }
+
     const { password, __v, email, ...other } = user.toObject();
 
     res.status(StatusCodes.OK).json({
@@ -67,8 +68,9 @@ const getUserByName = async (req: Request, res: Response) => {
 const searchUser = async (req: Request, res: Response) => {
   try {
     const { username, sort, limit = 10 } = req.query;
-
     let searchTerm: { [key: string]: any } = {};
+
+    console.log(username)
 
     if (username) {
       searchTerm.username = { $regex: username as string, $options: "i" };
@@ -82,15 +84,19 @@ const searchUser = async (req: Request, res: Response) => {
       sortTerm = "asc";
     }
 
-    const user = await User.find(searchTerm)
+    const users = await User.find(searchTerm)
       .limit(Number(limit))
-      .sort(sortTerm);
+      .sort(sortTerm)
+      .select("id username image");
 
-    if (!user) {
+    if (!users) {
       return;
     }
 
-    res.status(200).send(user);
+    res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      users,
+    });
   } catch (error) {
     return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
@@ -189,7 +195,6 @@ const acceptRequest = async (req: Request, res: Response) => {
   const id = req.user;
   const { userToAcceptId } = req.params;
 
-  
   try {
     const userToAccept = await User.findOne({ _id: userToAcceptId });
     if (!userToAccept) {
@@ -198,13 +203,13 @@ const acceptRequest = async (req: Request, res: Response) => {
         message: "User doesn't exist",
       });
     }
-    
+
     checkUserIdentity({
       userTofollowId: String(userToAccept._id),
       currentUserId: id,
       res,
     });
-    
+
     const currentUser = await User.findOne({ _id: id });
     if (!currentUser) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -213,7 +218,6 @@ const acceptRequest = async (req: Request, res: Response) => {
       });
     }
 
-    
     if (!currentUser.request.includes(userToAccept._id)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
@@ -221,19 +225,18 @@ const acceptRequest = async (req: Request, res: Response) => {
       });
     }
 
-    
     await currentUser.updateOne({
       $push: { followers: userToAccept._id },
       $pull: { request: userToAccept._id },
       $inc: { followersLength: 1 },
     });
-    
+
     await userToAccept.updateOne({
       $push: { followings: currentUser._id },
-      $inc: {followingsLength: 1}
+      $inc: { followingsLength: 1 },
     });
-    
-    console.log('USER ID 3' + userToAcceptId)
+
+    console.log("USER ID 3" + userToAcceptId);
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,

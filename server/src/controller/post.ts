@@ -142,7 +142,6 @@ const likeOrUnlikePost = async (req: Request, res: Response) => {
 
 // Get All Posts
 const getAllPost = async (req: Request, res: Response) => {
-  console.log("here");
   try {
     const post = await Post.find()
       .populate("likes", ["_id", "username", "createdAt"])
