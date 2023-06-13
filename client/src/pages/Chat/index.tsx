@@ -7,7 +7,7 @@ import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import Button from "../../components/UI/Button";
 import SideContent from "../../components/SideContent";
 import { selectCurrentUser } from "../../features/slice/authSlice";
-import { socket } from "../../lib/socket/config";
+import { socket, socketConnect } from "../../lib/socket/config";
 import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
 import { IAuthInitialState } from "../../utils/types/types";
 import {
@@ -19,7 +19,7 @@ import { useGetConversationsQuery } from "../../features/api/conversations";
 interface IMessage {
   status: string | undefined;
   content: string | undefined;
-  sender: string | undefined;
+  sender: { _id: string | undefined; username: string | undefined };
 }
 
 const index = () => {
@@ -36,6 +36,8 @@ const index = () => {
   const { data: conversations } = useGetConversationsQuery({});
   const { data, refetch } = useGetMessagesQuery(id);
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     setMessages(data?.message?.messages);
   }, [data]);
@@ -50,7 +52,6 @@ const index = () => {
     const receiverInfo = reciever[0].users.filter((u: any) => {
       return u._id !== user.user?.userId;
     });
-
 
     socket.emit("private_message", {
       sender: { username: user?.user?.username, userId: user?.user?.userId },
@@ -67,8 +68,14 @@ const index = () => {
       sender: user.user?.userId,
     };
 
+    const newmsg = {
+      status: "DELIVERED",
+      content: input,
+      sender: { _id: user.user?.userId, username: user.user?.username },
+    };
+
     await sendMessage({ msg, conversationId: id });
-    setMessages((prev) => [...prev, msg])
+    setMessages((prev) => [...prev, newmsg]);
   };
 
   const handleEmoji = (emoji: EmojiClickData) => {
@@ -77,10 +84,9 @@ const index = () => {
 
   useEffect(() => {
     socket.on("private_message", ({ sender, reciever, message }) => {
-      
       if (reciever.username == user?.user?.username) {
-        setArrivalMessage({ status: "DELIVERED", content: message, sender }); 
-        // console.log("RECIEVED " + reciever.username);
+        setArrivalMessage({ status: "DELIVERED", content: message, sender });
+        console.log("RECIEVED " + sender.username);
       }
     });
   }, []);
@@ -90,42 +96,73 @@ const index = () => {
   }, [arrivalMessage]);
 
   useEffect(() => {
-    refetch()
+    refetch();
+    socketConnect(user);
     recieverRef.current?.focus;
   }, []);
 
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
-    <div style={{ flex: "1", display: "flex", gap: "1em" }}>
+    <div style={{ flex: "1", display: "flex", gap: "1em", overflow: "hidden" }}>
       <PageContainer style={{ display: "flex", flexDirection: "column" }}>
         <PageTitle>
           <h1>{name}</h1>
         </PageTitle>
 
-        <div style={{ flex: "1" }}>
-          <div style={{ minHeight: "100%", position: "relative" }}>
-            <div>{messages && messages?.map((m) => <p>{m.content}</p>)}</div>
+        <div style={{ flex: "1", overflow: "hidden", position: "relative" }}>
+          <div
+            style={{
+              height: "90%",
+              overflowY: "scroll",
+              padding: "1em",
+              width: "100%",
+            }}
+          >
+            <div style={{ width: "100%", height: "100%" }}>
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                {messages &&
+                  messages?.map((m) => (
+                    <ChatBubble
+                      fromSelf={m.sender._id == user.user?.userId}
+                      ref={scrollRef}
+                    >
+                      <p>{m.content}</p>
+                    </ChatBubble>
+                  ))}
+              </div>
 
-            <MessageInputContainer>
-              <Form onSubmit={handleSendMessage}>
-                <Input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Text Message"
-                />
-                <span onClick={() => setOpenEmoji(!openEmoji)}>
-                  <BsEmojiSmile />
-                </span>
-                <Button label="Send" isLoading={false} color={false} />
-              </Form>
-            </MessageInputContainer>
-            {openEmoji && (
-              <EmojiContainer>
-                <EmojiPicker
-                  onEmojiClick={(emoji: EmojiClickData) => handleEmoji(emoji)}
-                />
-              </EmojiContainer>
-            )}
+              <MessageInputContainer>
+                <Form onSubmit={handleSendMessage}>
+                  <Input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Text Message"
+                  />
+                  <span onClick={() => setOpenEmoji(!openEmoji)}>
+                    <BsEmojiSmile />
+                  </span>
+                  <Button label="Send" isLoading={false} color={false} />
+                </Form>
+              </MessageInputContainer>
+              {openEmoji && (
+                <EmojiContainer>
+                  <EmojiPicker
+                    onEmojiClick={(emoji: EmojiClickData) => handleEmoji(emoji)}
+                  />
+                </EmojiContainer>
+              )}
+            </div>
           </div>
         </div>
       </PageContainer>
@@ -275,4 +312,28 @@ const SideFriendInner = styled.div`
   p {
     font-weight: 600;
   }
+`;
+
+interface IProps {
+  fromSelf: boolean;
+}
+
+const ChatBubble = styled.div<IProps>`
+  max-width: 40%;
+  /* width: fit-content; */
+  word-wrap: break-word;
+  padding: 0.5em 1em;
+  margin-top: 0.5em;
+  align-self: ${(props) => (props.fromSelf ? "flex-start" : "flex-end")};
+  background: ${(props) =>
+    props.fromSelf ? "var(--primary--color-300)" : "var(--primary--color-400)"};
+  color: white;
+  border-bottom-left-radius: ${(props) => (props.fromSelf ? "" : "")};
+  border-top-left-radius: ${(props) => (props.fromSelf ? "1.5em" : "1.5em")};
+  border-bottom-right-radius: ${(props) => (props.fromSelf ? "1.5em" : "")};
+  border-top-right-radius: ${(props) => (props.fromSelf ? "1.5em" : "")};
+
+  border-bottom-right-radius: ${(props) => (props.fromSelf ? "" : "")};
+  border-bottom-left-radius: ${(props) => (props.fromSelf ? "" : "1.5em")};
+  border-top-right-radius: ${(props) => (props.fromSelf ? "" : "1.5em")};
 `;
