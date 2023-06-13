@@ -10,7 +10,7 @@ import { useSignInUserMutation } from "../../../features/api/auth";
 import { useNavigate } from "react-router-dom";
 import { setCredentials } from "../../../features/slice/authSlice";
 import { useAppDispatch } from "../../../app/hooks";
-// import { useDispatch } from "react-redux";
+import { socketConnect } from "../../../lib/socket/config";
 
 const index = () => {
   const dispatch = useAppDispatch();
@@ -37,6 +37,11 @@ const index = () => {
       const data = await loginUser(userInfo).unwrap();
       setUserInfo({ username: "", password: "" });
       dispatch(setCredentials(data.user));
+      socketConnect({
+        token: data.user.accessToken,
+        user: { username: data.user.username, userId: data.user.userId },
+        expiresAt: data.user.expiresAt,
+      });
       navigate("/", { replace: true });
     } catch (error) {}
   };

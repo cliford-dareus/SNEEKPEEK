@@ -15,10 +15,10 @@ const index = ({ data }: IProp) => {
     searchTerm: data.searchTerm,
   });
 
-  const handleConversation = async (id: string) => {
+  const handleConversation = async ({id, name}: {id: string, name: string}) => {
     try {
       const channel = await createConversation(id).unwrap();
-      Navigate(`chat/${channel?.conversation._id}`)
+      Navigate(`chat/${name}/${channel?.conversation._id}`)
     } catch (error) {
       console.log(error)
     }
@@ -28,7 +28,7 @@ const index = ({ data }: IProp) => {
     <ReciepientPickerModal>
       {!isLoading &&
         users.users.map((user: IRequestData) => (
-          <p onClick={() => handleConversation(user._id)}>{user.username}</p>
+          <p onClick={() => handleConversation({id: user._id, name: user.username})}>{user.username}</p>
         ))}
     </ReciepientPickerModal>
   );

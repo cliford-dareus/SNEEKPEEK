@@ -7,10 +7,8 @@ const createConversation = async (req: Request, res: Response) => {
     const currentUser = req.user;
     const {recieverId} = req.body;
 
-    console.log("PASS ID :" + recieverId)
-
     const hasConversated = await Conversation.findOne({
-      user: {
+      users: {
         $all: [currentUser, recieverId],
       },
     });
@@ -47,10 +45,8 @@ const getAllConversation = async (req: Request, res: Response) => {
       },
     })
     .sort({ updatedAt: -1 })
-    // .populate("Users", ["username", "_id", "image"]);
-    
-    console.log(conversation)
-
+    .populate("users", ["username", "_id", "image"]);
+  
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       conversation,

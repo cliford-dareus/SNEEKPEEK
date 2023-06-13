@@ -19,6 +19,7 @@ import postRouter from "./router/post";
 import commentRouter from "./router/comment";
 import userRouter from "./router/user";
 import conversationRouter from "./router/conversation";
+import messageRouter from "./router/message";
 
 import connectDB from "./db/connect";
 
@@ -32,6 +33,7 @@ app.use("/api/v1/post", postRouter);
 app.use("/api/v1/comment", commentRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/conversation", conversationRouter);
+app.use("/api/v1/message", messageRouter);
 
 const PORT = process.env.PORT || 4000;
 
@@ -44,6 +46,10 @@ ioServer.use((socket, next) => {
   console.log(socket.handshake.auth);
   const username = socket.handshake.auth.name;
   const userId = socket.handshake.auth.id;
+
+  if(!username || !userId) {
+    return 
+  }
 
   // @ts-ignore
   socket.username = username;
@@ -58,7 +64,6 @@ IO(ioServer);
 const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI!);
-
     httpServer.listen(PORT, () => {
       console.log("Listening on port " + PORT);
     });

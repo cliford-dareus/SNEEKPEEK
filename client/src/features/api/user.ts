@@ -36,16 +36,27 @@ export const userApi = createApi({
     acceptRequest: builder.mutation({
       query: (userId) => ({
         url: `/user/accept-request/${userId}`,
-        method: 'POST',
+        method: "POST",
       }),
-      invalidatesTags: ['User']
+      invalidatesTags: ["User"],
     }),
     searchUser: builder.query({
       query: (payload) => ({
-        url: `/user?username=${payload.searchTerm}`
-      })
-    })
+        url: `/user?username=${payload.searchTerm}`,
+      }),
+    }),
+    getUserById: builder.query({
+      query: (id) => ({
+        url: `/user/single/${id}`,
+      }),
+    }),
   }),
 });
 
-export const { useGetUserByUsernameQuery, useFollowUserMutation, useAcceptRequestMutation, useSearchUserQuery } = userApi;
+export const {
+  useGetUserByUsernameQuery,
+  useFollowUserMutation,
+  useAcceptRequestMutation,
+  useSearchUserQuery,
+  useGetUserByIdQuery,
+} = userApi;

@@ -3,12 +3,22 @@ import { IMessage } from "../types/typing";
 
 const MessagesSchema = new mongoose.Schema(
   {
-    conversationId: {
+    channelId: {
       type: mongoose.Types.ObjectId,
       ref: "Conversation",
+      required: true
     },
     messages: {
-      type: [],
+      type: [
+        {
+          status: String,
+          content: String,
+          sender: {
+            type: mongoose.Types.ObjectId,
+            ref: "User",
+          },
+        },
+      ],
     },
   },
   { timestamps: true }

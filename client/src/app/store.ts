@@ -8,6 +8,7 @@ import { postApi } from "../features/api/post";
 import { commentApi } from "../features/api/comment";
 import { userApi } from "../features/api/user";
 import { conversationApi } from "../features/api/conversations";
+import { messageApi } from "../features/api/message";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     [commentApi.reducerPath]: commentApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [conversationApi.reducerPath]: conversationApi.reducer,
+    [messageApi.reducerPath]: messageApi.reducer,
     auth: authReducer,
     messages: messageReducer,
   },
@@ -25,7 +27,8 @@ export const store = configureStore({
       postApi.middleware,
       commentApi.middleware,
       userApi.middleware,
-      conversationApi.middleware
+      conversationApi.middleware,
+      messageApi.middleware
     ),
 });
 

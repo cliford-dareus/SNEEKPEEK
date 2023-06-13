@@ -8,8 +8,8 @@ export interface IConversation {
 }
 
 export interface IMessage {
-  conservationId: ObjectId;
-  messages: { status: status.DELIVERED; content: string; sender: string }[];
+  channelId: ObjectId;
+  messages: { status: status.DELIVERED; content: string; sender: ObjectId }[];
 }
 
 enum status {

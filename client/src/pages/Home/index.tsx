@@ -21,11 +21,11 @@ const index = () => {
     );
   };
 
-  useEffect(() => {
-    if (auth) {
-      socketConnect(auth);
-    }
-  }, [auth]);
+  // useEffect(() => {
+  //   if (auth.token !== '') {
+  //     socketConnect(auth);
+  //   }
+  // }, [auth.token]);
 
   return (
     <PageContainer>

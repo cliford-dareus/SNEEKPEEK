@@ -1,17 +1,20 @@
-import styled from "styled-components";
-import { useAppSelector } from "../../app/hooks";
-import SideContent from "../../components/SideContent";
-import { selectCurrentUser } from "../../features/slice/authSlice";
-import { BsPlusCircle } from "react-icons/bs";
-import { useGetUserByUsernameQuery } from "../../features/api/user";
-import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
-import { InputContainer } from "../Chat";
-import { useGetConversationsQuery } from "../../features/api/conversations";
-import SearchModal from "../../components/UI/SearchModal";
 import { useEffect, useState } from "react";
+import styled from "styled-components";
+import { InputContainer } from "../Chat";
+import { useAppSelector } from "../../app/hooks";
+import { BsPlusCircle } from "react-icons/bs";
+import { IAuthInitialState } from "../../utils/types/types";
+import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
+import { selectCurrentUser } from "../../features/slice/authSlice";
+import { useGetUserByUsernameQuery } from "../../features/api/user";
+import { useGetConversationsQuery } from "../../features/api/conversations";
+import SideContent from "../../components/SideContent";
+import SearchModal from "../../components/UI/SearchModal";
+import { socketConnect } from "../../lib/socket/config";
+
 
 const index = () => {
-  const user = useAppSelector(selectCurrentUser);
+  const user = useAppSelector(selectCurrentUser) as IAuthInitialState;
   const { data: conversations, isLoading } = useGetConversationsQuery({});
   const { data: currentUserData } = useGetUserByUsernameQuery(
     user?.user?.username
@@ -19,7 +22,9 @@ const index = () => {
 
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  useEffect(() => {}, [searchTerm]);
+  useEffect(()=> {
+    socketConnect(user)
+  }, [])
 
   return (
     <div style={{ flex: "1", display: "flex", gap: "1em" }}>
@@ -45,10 +50,10 @@ const index = () => {
         </PageTitle>
 
         <div style={{ flex: "1" }}>
-          {!isLoading && conversations.length > 0 ? (
+          {!isLoading && conversations?.conversation.length > 0 ? (
             <div>
               {conversations?.conversation.map((conversation: any) => (
-                <p>{conversation.lastmessage}</p>
+                <p>{conversation.users[1].username}</p>
               ))}
             </div>
           ) : (

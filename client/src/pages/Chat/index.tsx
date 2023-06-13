@@ -1,42 +1,74 @@
 import styled from "styled-components";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { BsEmojiSmile } from "react-icons/bs";
 import { useAppSelector } from "../../app/hooks";
-import { BsEmojiSmile, BsPlusCircle } from "react-icons/bs";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import Button from "../../components/UI/Button";
-import ReciepientModal from "../../components/UI/SearchModal";
 import SideContent from "../../components/SideContent";
 import { selectCurrentUser } from "../../features/slice/authSlice";
-import { useGetUserByUsernameQuery } from "../../features/api/user";
 import { socket } from "../../lib/socket/config";
 import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
+import { IAuthInitialState } from "../../utils/types/types";
+import {
+  useAddNewMessageMutation,
+  useGetMessagesQuery,
+} from "../../features/api/message";
+import { useGetConversationsQuery } from "../../features/api/conversations";
 
 interface IMessage {
-  sender: { username: string; userId: string };
-  reciever: { username: string; userId: string };
-  message: string;
+  status: string | undefined;
+  content: string | undefined;
+  sender: string | undefined;
 }
 
 const index = () => {
-  const user = useAppSelector(selectCurrentUser);
+  const { id, name } = useParams();
+  const user = useAppSelector(selectCurrentUser) as IAuthInitialState;
+
   const [input, setInput] = useState("");
-  const [receipient, setReciepient] = useState({ userId: "", username: "" });
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [arrivalMessage, setArrivalMessage] = useState<IMessage>();
   const recieverRef = useRef<HTMLInputElement>(null);
   const [openEmoji, setOpenEmoji] = useState<boolean>(false);
-  const [openReciepientList, setOpenReciepientList] = useState<boolean>(false);
-  const { data: currentUserData } = useGetUserByUsernameQuery(
-    user?.user?.username
-  );
 
-  const handleSendMessage = (e: FormEvent<HTMLFormElement>) => {
+  const [sendMessage] = useAddNewMessageMutation();
+  const { data: conversations } = useGetConversationsQuery({});
+  const { data, refetch } = useGetMessagesQuery(id);
+
+  useEffect(() => {
+    setMessages(data?.message?.messages);
+  }, [data]);
+
+  const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const reciever = conversations?.conversation.filter((u: any) => {
+      return u._id === id;
+    });
+
+    const receiverInfo = reciever[0].users.filter((u: any) => {
+      return u._id !== user.user?.userId;
+    });
+
+
     socket.emit("private_message", {
       sender: { username: user?.user?.username, userId: user?.user?.userId },
-      reciever: { username: receipient.username, userId: receipient.userId },
+      reciever: {
+        username: receiverInfo[0].username,
+        userId: receiverInfo[0]._id,
+      },
       message: input,
     });
+
+    const msg = {
+      status: "DELIVERED",
+      content: input,
+      sender: user.user?.userId,
+    };
+
+    await sendMessage({ msg, conversationId: id });
+    setMessages((prev) => [...prev, msg])
   };
 
   const handleEmoji = (emoji: EmojiClickData) => {
@@ -45,17 +77,20 @@ const index = () => {
 
   useEffect(() => {
     socket.on("private_message", ({ sender, reciever, message }) => {
-      if (sender.username !== user?.user?.username) {
-        setArrivalMessage({ sender, reciever, message });
+      
+      if (reciever.username == user?.user?.username) {
+        setArrivalMessage({ status: "DELIVERED", content: message, sender }); 
+        // console.log("RECIEVED " + reciever.username);
       }
     });
   }, []);
 
   useEffect(() => {
-    arrivalMessage && setMessages((prev) => [...prev, { ...arrivalMessage }]);
+    arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
   }, [arrivalMessage]);
 
   useEffect(() => {
+    refetch()
     recieverRef.current?.focus;
   }, []);
 
@@ -63,48 +98,12 @@ const index = () => {
     <div style={{ flex: "1", display: "flex", gap: "1em" }}>
       <PageContainer style={{ display: "flex", flexDirection: "column" }}>
         <PageTitle>
-          <InputContainer
-            style={{ position: "relative", isolation: "isolate" }}
-          >
-            <p>To :</p>
-            <Input
-              type="text"
-              ref={recieverRef}
-              autoFocus
-              name="username"
-              value={receipient.username}
-              onChange={(e) =>
-                setReciepient({
-                  ...receipient,
-                  [e.target.name]: e.target.value,
-                })
-              }
-            />
-            <span onClick={() => setOpenReciepientList(!openReciepientList)}>
-              <BsPlusCircle />
-            </span>
-          </InputContainer>
-
-          {openReciepientList && (
-            <ReciepientModal
-              currentUserData={currentUserData}
-              setReciepient={setReciepient}
-              openReciepientList={openReciepientList}
-              searchWord={receipient.username}
-              setOpenReciepientList={setOpenReciepientList}
-            />
-          )}
+          <h1>{name}</h1>
         </PageTitle>
 
         <div style={{ flex: "1" }}>
           <div style={{ minHeight: "100%", position: "relative" }}>
-            <div>
-              {messages?.map((message) => (
-                <>
-                  <p>{message.message}</p>
-                </>
-              ))}
-            </div>
+            <div>{messages && messages?.map((m) => <p>{m.content}</p>)}</div>
 
             <MessageInputContainer>
               <Form onSubmit={handleSendMessage}>
@@ -141,7 +140,7 @@ const index = () => {
 
           <SideFriendInner>
             <p>Followers</p>
-            {currentUserData
+            {/* {currentUserData
               ? currentUserData.user.followers.map((follower: any) => (
                   <div
                     style={{
@@ -163,12 +162,12 @@ const index = () => {
                     <p>new</p>
                   </div>
                 ))
-              : null}
+              : null} */}
           </SideFriendInner>
 
           <SideFriendInner>
             <p>Followings</p>
-            {currentUserData
+            {/* {currentUserData
               ? currentUserData.user.followings.map((follower: any) => (
                   <div
                     style={{
@@ -190,7 +189,7 @@ const index = () => {
                     <p>new</p>
                   </div>
                 ))
-              : null}
+              : null} */}
           </SideFriendInner>
         </SideFriendContainer>
       </SideContent>
@@ -200,7 +199,7 @@ const index = () => {
 
 export default index;
 
- export const InputContainer = styled.div`
+export const InputContainer = styled.div`
   display: flex;
   align-items: center;
 

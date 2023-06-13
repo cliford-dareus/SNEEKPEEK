@@ -13,7 +13,7 @@ import isAuthenticated from "../middleware/isAuthenticated ";
 const router = expres.Router();
 
 router.route("/").get(searchUser);
-// router.route("/:id").get(getUser);
+router.route("/single/:id").get(getUser);
 router.route('/:username').get(getUserByName)
 router.route("/update").patch(isAuthenticated, editUser);
 router.route("/follow/:username").post(isAuthenticated, followUser);

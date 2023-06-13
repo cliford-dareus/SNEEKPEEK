@@ -1,4 +1,4 @@
-// import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
@@ -9,23 +9,21 @@ import ProfileLikes from "./pages/Profile/Likes";
 import ProfileTags from "./pages/Profile/Tags";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
+import Chat from "./pages/Chat";
 
 import Layout from "./components/Layout";
 import Message from "./components/SideContent/messages";
 import Trending from "./components/SideContent/trending";
 import Request from "./components/SideContent/request";
 import DashboardLayout from "./components/DashboardLayout";
+
 import useRefreshToken from "./lib/hooks/useRefreshToken";
 import { GlobalStyles } from "./lib/styled-component/globalStyles";
 import { PrivateOutlet } from "./utils/Private/PrivateOutlet";
-import { useEffect } from "react";
 
 function App() {
   const _ = useRefreshToken();
-  
-  useEffect(() => {
-  },[])
-  
+
   return (
     <>
       <GlobalStyles />
@@ -41,8 +39,9 @@ function App() {
               <Route path="tags" element={<ProfileTags />} />
               <Route path="requests" element={<ProfileRequest />} />
             </Route>
-            
+
             <Route path="messages" element={<Messages />} />
+            <Route path="messages/chat/:name/:id" element={<Chat />} />
           </Route>
 
           <Route path="/" element={<DashboardLayout />}>
