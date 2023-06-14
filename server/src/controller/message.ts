@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import Messages from "../models/Messages";
+import { status } from "../types/typing";
 
 const addNewMessage = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const msg = req.body;
 
-    const conversation = await Messages.findOne({ channelId: id});
-
-    console.log(id);
+    const conversation = await Messages.findOne({ channelId: id });
 
     if (conversation) {
       conversation.messages = [...conversation.messages, msg];
@@ -58,4 +57,25 @@ const getAllMessage = async (req: Request, res: Response) => {
   }
 };
 
-export { addNewMessage, getAllMessage };
+const updateMessageStatus = async (req: Request, res: Response) => {
+  try {
+    const { channelId } = req.params;
+    const { status } = req.query;
+    const message = await Messages.updateMany(
+      { channelId },
+      { $set: { 'messages.$[elem].status': status} },
+      {arrayFilters: [{'elem.status': 'DELIVERED'}]}
+    );
+
+    res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+    });
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
+};
+
+export { addNewMessage, getAllMessage, updateMessageStatus };

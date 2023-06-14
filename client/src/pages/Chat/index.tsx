@@ -1,19 +1,20 @@
+import { FormEvent, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { BsEmojiSmile } from "react-icons/bs";
 import { useAppSelector } from "../../app/hooks";
-import { FormEvent, useEffect, useRef, useState } from "react";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import Button from "../../components/UI/Button";
 import SideContent from "../../components/SideContent";
-import { selectCurrentUser } from "../../features/slice/authSlice";
 import { socket, socketConnect } from "../../lib/socket/config";
 import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
 import { IAuthInitialState } from "../../utils/types/types";
 import {
   useAddNewMessageMutation,
   useGetMessagesQuery,
+  useUpdateMessageStatusMutation,
 } from "../../features/api/message";
+import { selectCurrentUser } from "../../features/slice/authSlice";
 import { useGetConversationsQuery } from "../../features/api/conversations";
 
 interface IMessage {
@@ -33,6 +34,7 @@ const index = () => {
   const [openEmoji, setOpenEmoji] = useState<boolean>(false);
 
   const [sendMessage] = useAddNewMessageMutation();
+  const [updateStatus] = useUpdateMessageStatusMutation();
   const { data: conversations } = useGetConversationsQuery({});
   const { data, refetch } = useGetMessagesQuery(id);
 
@@ -83,10 +85,19 @@ const index = () => {
   };
 
   useEffect(() => {
-    socket.on("private_message", ({ sender, reciever, message }) => {
-      if (reciever.username == user?.user?.username) {
+    socket.on("private_message", async ({ sender, reciever, message }) => {
+      if (
+        reciever.username == user?.user?.username &&
+        sender.username === name
+      ) {
         setArrivalMessage({ status: "DELIVERED", content: message, sender });
-        console.log("RECIEVED " + sender.username);
+
+        if (window.location.pathname.includes("/chat")) {
+          await updateStatus({ channelId: id, status: "READ" });
+          console.log("RECIEVED " + sender.username);
+        }else{
+
+        }
       }
     });
   }, []);
@@ -133,7 +144,7 @@ const index = () => {
                 {messages &&
                   messages?.map((m) => (
                     <ChatBubble
-                      fromSelf={m.sender._id == user.user?.userId}
+                      fromSelf={m?.sender?._id == user.user?.userId}
                       ref={scrollRef}
                     >
                       <p>{m.content}</p>
@@ -148,6 +159,7 @@ const index = () => {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Text Message"
+                    ref={recieverRef}
                   />
                   <span onClick={() => setOpenEmoji(!openEmoji)}>
                     <BsEmojiSmile />
@@ -320,7 +332,6 @@ interface IProps {
 
 const ChatBubble = styled.div<IProps>`
   max-width: 40%;
-  /* width: fit-content; */
   word-wrap: break-word;
   padding: 0.5em 1em;
   margin-top: 0.5em;

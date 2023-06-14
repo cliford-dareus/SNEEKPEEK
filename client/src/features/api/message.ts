@@ -21,8 +21,17 @@ export const messageApi = createApi({
       }),
       invalidatesTags: ["Message"],
     }),
+    updateMessageStatus: builder.mutation({
+      query: ({ channelId, status }) => ({
+        url: `/message/status/${channelId}?status=${status}`,
+        method: "PATCH",
+      }),
+    }),
   }),
 });
 
-export const { useAddNewMessageMutation, useGetMessagesQuery } =
-  messageApi;
+export const {
+  useAddNewMessageMutation,
+  useGetMessagesQuery,
+  useUpdateMessageStatusMutation,
+} = messageApi;

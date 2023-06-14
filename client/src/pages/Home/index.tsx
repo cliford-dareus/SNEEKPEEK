@@ -1,12 +1,10 @@
 import { useGetPostQuery } from "../../features/api/post";
-import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
-import Loader from "../../components/UI/Loader";
 import { IPost } from "../../utils/types/types";
-import Card from "../../components/UI/Card";
 import Featured from "./components/CreatePost";
+import Loader from "../../components/UI/Loader";
+import Card from "../../components/UI/Card";
 import { useAuth } from "../../lib/hooks/useAuth";
-import { useEffect } from "react";
-import { socketConnect } from "../../lib/socket/config";
+import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
 // import { motion } from "framer-motion";
 
 const index = () => {
@@ -20,12 +18,6 @@ const index = () => {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   };
-
-  // useEffect(() => {
-  //   if (auth.token !== '') {
-  //     socketConnect(auth);
-  //   }
-  // }, [auth.token]);
 
   return (
     <PageContainer>

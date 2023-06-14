@@ -9,13 +9,12 @@ export interface IConversation {
 
 export interface IMessage {
   channelId: ObjectId;
-  messages: { status: status.DELIVERED; content: string; sender: ObjectId }[];
+  messages: { status: status; content: string; sender: ObjectId }[];
 }
 
-enum status {
+export enum status {
   READ,
   RECIEVE,
-  SEEN,
   DELIVERED,
 }
 
