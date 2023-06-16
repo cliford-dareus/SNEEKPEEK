@@ -4,7 +4,7 @@ import { Document, Model, ObjectId } from "mongoose";
 // @MESSAGE
 export interface IConversation {
   users: ObjectId[];
-  messages: ObjectId;
+  lastmessage: string;
 }
 
 export interface IMessage {
@@ -61,10 +61,6 @@ export interface ICreateJwtPayLoad {
   payload: { user: UserToken; refreshToken?: string };
 }
 
-// interface ISignUpPayload {
-//   name:
-// }
-
 // @POST
 export interface IPost {
   author: ObjectId;
@@ -91,4 +87,18 @@ export interface IJwtUser {
 
 export interface IAccessToken {
   accessToken: string;
+}
+
+// @NOTIFICATION
+export interface INotification {
+  sender: ObjectId;
+  target: ObjectId;
+  type: TYPE;
+}
+
+enum TYPE {
+  FOLLOW,
+  TAG,
+  LIKE,
+  COMMENT,
 }

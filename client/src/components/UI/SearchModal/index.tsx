@@ -27,7 +27,7 @@ const index = ({ data }: IProp) => {
   return (
     <ReciepientPickerModal>
       {!isLoading &&
-        users.users.map((user: IRequestData) => (
+        users?.users.map((user: IRequestData) => (
           <p onClick={() => handleConversation({id: user._id, name: user.username})}>{user.username}</p>
         ))}
     </ReciepientPickerModal>

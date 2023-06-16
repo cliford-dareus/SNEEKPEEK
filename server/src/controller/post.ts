@@ -110,17 +110,16 @@ const likeOrUnlikePost = async (req: Request, res: Response) => {
 
   try {
     const post = await Post.findById(postId);
-    console.log("POST" + post);
+
     if (!post) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "No post wid this id" });
     }
 
-    console.log("USER ID" + id);
-
     if (post.likes.includes(id)) {
       await post.updateOne({ $pull: { likes: id } });
+      
       res.status(StatusCodes.OK).json({
         status: StatusCodes.OK,
         message: "Post unliked",

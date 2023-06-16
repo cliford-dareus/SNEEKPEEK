@@ -16,6 +16,7 @@ import {
 } from "../../features/api/message";
 import { selectCurrentUser } from "../../features/slice/authSlice";
 import { useGetConversationsQuery } from "../../features/api/conversations";
+import { toast } from "react-toastify";
 
 interface IMessage {
   status: string | undefined;
@@ -41,7 +42,11 @@ const index = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMessages(data?.message?.messages);
+    if (data?.message?.messages === undefined) {
+      setMessages([]);
+    }else{
+      setMessages(data?.message?.messages);
+    }
   }, [data]);
 
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
@@ -91,12 +96,12 @@ const index = () => {
         sender.username === name
       ) {
         setArrivalMessage({ status: "DELIVERED", content: message, sender });
-
         if (window.location.pathname.includes("/chat")) {
+          //  Get rid of this here add on page opened
           await updateStatus({ channelId: id, status: "READ" });
-          console.log("RECIEVED " + sender.username);
-        }else{
-
+          // console.log("RECIEVED " + sender.username);
+        } else if (!window.location.pathname.includes("/chat")) {
+          toast("New Message from " + sender.username);
         }
       }
     });

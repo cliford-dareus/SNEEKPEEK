@@ -20,9 +20,22 @@ import DashboardLayout from "./components/DashboardLayout";
 import useRefreshToken from "./lib/hooks/useRefreshToken";
 import { GlobalStyles } from "./lib/styled-component/globalStyles";
 import { PrivateOutlet } from "./utils/Private/PrivateOutlet";
+import { socket } from "./lib/socket/config";
+import { toast } from "react-toastify";
+import { useAppSelector } from "./app/hooks";
+import { selectCurrentUser } from "./features/slice/authSlice";
 
 function App() {
   const _ = useRefreshToken();
+  const user = useAppSelector(selectCurrentUser);
+
+  useEffect(() => {
+    socket.on("notification", ({ sender, target, message }) => {
+      if (target.userId === user.user?.userId) {
+        toast(sender.username + message);
+      }
+    });
+  }, []);
 
   return (
     <>

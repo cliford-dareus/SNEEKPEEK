@@ -11,7 +11,7 @@ import { useGetConversationsQuery } from "../../features/api/conversations";
 import SideContent from "../../components/SideContent";
 import SearchModal from "../../components/UI/SearchModal";
 import { socketConnect } from "../../lib/socket/config";
-
+import { Link } from "react-router-dom";
 
 const index = () => {
   const user = useAppSelector(selectCurrentUser) as IAuthInitialState;
@@ -22,13 +22,15 @@ const index = () => {
 
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  useEffect(()=> {
-    socketConnect(user)
-  }, [])
+  useEffect(() => {
+    socketConnect(user);
+  }, []);
 
   return (
     <div style={{ flex: "1", display: "flex", gap: "1em" }}>
-      <PageContainer style={{ display: "flex", flexDirection: "column" }}>
+      <PageContainer
+        style={{ display: "flex", flexDirection: "column", gap: "1em" }}
+      >
         <PageTitle>
           <InputContainer style={{ justifyContent: "space-between" }}>
             <h1>Messages</h1>
@@ -49,12 +51,27 @@ const index = () => {
           </InputContainer>
         </PageTitle>
 
-        <div style={{ flex: "1" }}>
+        <div
+          style={{
+            flex: "1",
+            padding: "1em",
+            backgroundColor: "var(--dark--color-800)",
+            borderRadius: "10px",
+          }}
+        >
           {!isLoading && conversations?.conversation.length > 0 ? (
             <div>
-              {conversations?.conversation.map((conversation: any) => (
-                <p>{conversation.users[1].username}</p>
-              ))}
+              {conversations?.conversation.map((con: any) => {
+                const friend = con?.users.filter(
+                  (friend: any) => friend._id !== user.user?.userId
+                );
+                return (
+                  <Link to={`chat/${friend[0].username}/${con._id}`}>
+                    <p>{friend[0].username}</p>
+                    {/* Add the laast Message */}
+                  </Link>
+                );
+              })}
             </div>
           ) : (
             <div>New Message</div>

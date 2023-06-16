@@ -3,23 +3,33 @@ import { IRequestData } from "../../../utils/types/types";
 import styled from "styled-components";
 import { RiUserFollowLine, RiUserUnfollowLine } from "react-icons/ri";
 import { useAcceptRequestMutation } from "../../../features/api/user";
+import { useAppSelector } from "../../../app/hooks";
+import { selectCurrentUser } from "../../../features/slice/authSlice";
+import { socket } from "../../../lib/socket/config";
 
 const index: FC<{ req: IRequestData }> = ({ req }) => {
   const [accept] = useAcceptRequestMutation();
+  const user = useAppSelector(selectCurrentUser);
 
   const handleAcccept = async (id: string) => {
     try {
       await accept(id);
+
+      socket.emit("notification", {
+        message: "Request accepted",
+        target: { userId: req._id, username: req.username },
+        sender: { userId: user?.user?.userId, username: user?.user?.username },
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
   const handleReject = async (id: string) => {
     try {
-      console.log(id)
+      console.log(id);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 

@@ -12,19 +12,41 @@ import {
   useFollowUserMutation,
   useGetUserByUsernameQuery,
 } from "../../features/api/user";
-import { RootState } from "../../app/store";
+import { socket } from "../../lib/socket/config";
+import { selectCurrentUser } from "../../features/slice/authSlice";
+import { useEffect } from "react";
 
 const index = () => {
   const { name } = useParams();
+  const user = useAppSelector(selectCurrentUser);
   const [followUser] = useFollowUserMutation();
-  const { data: currentUser } = useGetUserByUsernameQuery(name);
-  const user = useAppSelector((state: RootState) => state.auth.user?.username);
+  const { data: currentUser, refetch } = useGetUserByUsernameQuery(name, {
+    refetchOnMountOrArgChange: true,
+  });
 
   const onFollowUser = async () => {
     try {
       await followUser({ username: name });
+
+      socket.emit("notification", {
+        sender: { userId: user.user?.userId, username: user.user?.username },
+        target: {
+          userId: currentUser?.user._id,
+          username: currentUser?.user.username,
+        },
+        type: "FOLLOW",
+        message: "You are now following " + name,
+      });
     } catch (error) {}
   };
+
+  useEffect(() => {
+    socket.on("notification", ({ sender, target, type, message }) => {
+      if (target.userId === user.user?.userId) {
+        refetch();
+      }
+    });
+  }, []);
 
   return (
     <div style={{ flex: "1", display: "flex", gap: "1em" }}>
@@ -38,7 +60,7 @@ const index = () => {
             <img src="" alt="" />
           </ProfileBanner>
 
-          {name !== user ? (
+          {name !== user?.user?.username ? (
             <ProfileBtn onClick={onFollowUser}>
               <Button label="Follow" isLoading={false} color={false} />
             </ProfileBtn>
@@ -104,7 +126,7 @@ const index = () => {
             <li>
               <Link to="tags">Tags</Link>{" "}
             </li>
-            {name == user && (
+            {name === user.user?.username && (
               <li>
                 <Link to="requests">Requests</Link>
               </li>

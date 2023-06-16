@@ -22,6 +22,7 @@ const createConversation = async (req: Request, res: Response) => {
 
     const conversation = await Conversation.create({
       users: [currentUser, recieverId],
+      lastmessage: 'Empty'
     });
 
     res.status(StatusCodes.OK).json({

@@ -30,8 +30,9 @@ export const userApi = createApi({
     followUser: builder.mutation({
       query: (payload) => ({
         url: `/user/follow/${payload.username}`,
-        method: "POST",
+        method: 'POST'
       }),
+      invalidatesTags: ['User']
     }),
     acceptRequest: builder.mutation({
       query: (userId) => ({

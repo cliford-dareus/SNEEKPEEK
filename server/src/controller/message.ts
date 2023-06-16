@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import Messages from "../models/Messages";
-import { status } from "../types/typing";
+import Conversation from "../models/Conversation";
 
 const addNewMessage = async (req: Request, res: Response) => {
   try {
@@ -9,10 +9,21 @@ const addNewMessage = async (req: Request, res: Response) => {
     const msg = req.body;
 
     const conversation = await Messages.findOne({ channelId: id });
+    const channel = await Conversation.findOne({ _id: id });
+    console.log(channel);
+
+    if (!channel) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        error: "Channel not found",
+      });
+    }
 
     if (conversation) {
       conversation.messages = [...conversation.messages, msg];
       await conversation.save();
+
+      channel.lastmessage = msg.content;
+      await channel.save();
 
       return res.status(StatusCodes.OK).json({
         status: StatusCodes.OK,
@@ -24,6 +35,9 @@ const addNewMessage = async (req: Request, res: Response) => {
       channelId: id,
       messages: [msg],
     });
+
+    channel.lastmessage = msg.content;
+    await channel.save();
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
@@ -61,10 +75,10 @@ const updateMessageStatus = async (req: Request, res: Response) => {
   try {
     const { channelId } = req.params;
     const { status } = req.query;
-    const message = await Messages.updateMany(
+    await Messages.updateMany(
       { channelId },
-      { $set: { 'messages.$[elem].status': status} },
-      {arrayFilters: [{'elem.status': 'DELIVERED'}]}
+      { $set: { "messages.$[elem].status": status } },
+      { arrayFilters: [{ "elem.status": "DELIVERED" }] }
     );
 
     res.status(StatusCodes.OK).json({

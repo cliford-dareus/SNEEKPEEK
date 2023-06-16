@@ -2,6 +2,7 @@ import { User } from "../models/User";
 import { Request, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { checkUserIdentity } from "../utils/checkUserIdentity";
+import Notification from "../models/Notifications";
 
 // Get User by id
 const getUser = async (req: Request, res: Response) => {
@@ -70,7 +71,7 @@ const searchUser = async (req: Request, res: Response) => {
     const { username, sort, limit = 10 } = req.query;
     let searchTerm: { [key: string]: any } = {};
 
-    console.log(username)
+    console.log(username);
 
     if (username) {
       searchTerm.username = { $regex: username as string, $options: "i" };
@@ -175,6 +176,12 @@ const followUser = async (req: Request, res: Response) => {
     });
 
     await userToFollow.updateOne({ $push: { request: id } });
+
+    await Notification.create({
+      sender: id,
+      target: userToFollow._id,
+      type: "REQUEST",
+    });
 
     return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
