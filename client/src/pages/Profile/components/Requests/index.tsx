@@ -1,6 +1,6 @@
 import { useOutletContext } from "react-router-dom";
-import RequestCard from "../../../components/UI/RequestCard";
-import { IRequestData } from "../../../utils/types/types";
+import RequestCard from "../../../../components/UI/RequestCard";
+import { IRequestData } from "../../../../utils/types/types";
 
 
 const index = () => {

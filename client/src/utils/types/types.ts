@@ -38,6 +38,22 @@ export interface IRefreshTokenResponse {
   user: IUserData;
 }
 
+export interface IFullUserResponse {
+  status: number;
+  user: {
+    followersLength: number;
+    followingsLength: number;
+    _id: string;
+    name: string;
+    username: string;
+    request: IRequestData[];
+    followers: IRequestData [];
+    followings: IRequestData [];
+    createdAt: string;
+    updatedAt: string;
+  }
+}
+
 export interface IPostPayload {
   content: string;
   image: string;
@@ -45,10 +61,7 @@ export interface IPostPayload {
 
 export interface IPost {
   _id: string;
-  author: {
-    _id: string;
-    username: string;
-  };
+  author: IRequestData;
   content: string;
   image: string;
   likes: ILikes[];

@@ -1,12 +1,9 @@
-import {
-  Flex,
-  PageContainer,
-  PageTitle,
-} from "../../lib/styled-component/styles";
+import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
 import { useAppSelector } from "../../app/hooks";
 import SideContent from "../../components/SideContent";
 import styled from "styled-components";
 import Button from "../../components/UI/Button";
+import ProfileDetails from "./components/ProfileDetails";
 import { Link, Outlet, useParams } from "react-router-dom";
 import {
   useFollowUserMutation,
@@ -15,6 +12,7 @@ import {
 import { socket } from "../../lib/socket/config";
 import { selectCurrentUser } from "../../features/slice/authSlice";
 import { useEffect } from "react";
+import { IFullUserResponse } from "../../utils/types/types";
 
 const index = () => {
   const { name } = useParams();
@@ -70,47 +68,7 @@ const index = () => {
             </ProfileBtn>
           )}
 
-          <ProfileDetails>
-            <div>
-              <h3>
-                {currentUser?.user.username}
-                <span
-                  style={{
-                    display: "block",
-                    fontSize: ".9rem",
-                    fontWeight: "normal",
-                    color: "var(--light--color-400)",
-                  }}
-                >
-                  @{currentUser?.user.username}
-                </span>
-              </h3>
-
-              <ProfileStats>
-                <div>
-                  <span>
-                    {currentUser?.user.followersLength == null
-                      ? 0
-                      : currentUser?.user.followersLength}
-                  </span>
-                  <span>followers</span>
-                </div>
-                <div>
-                  <span>
-                    {currentUser?.user.followingsLength == null
-                      ? 0
-                      : currentUser?.user.followingsLength}
-                  </span>{" "}
-                  <span>followings</span>
-                </div>
-              </ProfileStats>
-            </div>
-
-            <ProfileDesc>
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fugiat,
-              nostrum! kfdfldkmdfkmedcms asdmskamdsmd alksmdlkamsdas
-            </ProfileDesc>
-          </ProfileDetails>
+          <ProfileDetails currentUser={currentUser as IFullUserResponse} />
 
           <ProfilePic></ProfilePic>
         </ProfileHeader>
@@ -174,29 +132,6 @@ const ProfilePic = styled.div`
   border-radius: 50%;
   background-color: #c74bc7;
 `;
-
-const ProfileStats = styled(Flex)`
-  gap: 1em;
-
-  div {
-    padding: 0.5em 1em;
-    background-color: var(--dark--color-900);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    font-size: 0.9rem;
-  }
-`;
-
-const ProfileDetails = styled.div`
-  margin-top: 4.5em;
-  padding: 1em;
-  width: 100%;
-  align-items: center;
-  background-color: var(--dark--color-800);
-`;
-
-const ProfileDesc = styled.p``;
 
 const ProfileBtn = styled.div`
   position: absolute;

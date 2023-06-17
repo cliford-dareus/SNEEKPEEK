@@ -3,10 +3,10 @@ import { Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import ProfilePost from "./pages/Profile/Post";
-import ProfileRequest from "./pages/Profile/Requests";
-import ProfileLikes from "./pages/Profile/Likes";
-import ProfileTags from "./pages/Profile/Tags";
+import ProfilePost from "./pages/Profile/components/Post";
+import ProfileRequest from "./pages/Profile/components/Requests";
+import ProfileLikes from "./pages/Profile/components/Likes";
+import ProfileTags from "./pages/Profile/components/Tags";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
 import Chat from "./pages/Chat";

@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
-import Card from "../../../components/UI/Card";
-import { useGetUserPostQuery } from "../../../features/api/post";
-import Loader from "../../../components/UI/Loader";
-import { LoaderContainer } from "../index";
+import Card from "../../../../components/UI/Card";
+import { useGetUserPostQuery } from "../../../../features/api/post";
+import Loader from "../../../../components/UI/Loader";
+import { LoaderContainer } from "../../index";
 
 const index = () => {
   const { name } = useParams();

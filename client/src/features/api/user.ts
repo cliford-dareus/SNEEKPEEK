@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/dist/query/react";
 import { baseQuery } from "../../utils/Private/PrivateQuery";
+import { IFullUserResponse } from "../../utils/types/types";
 
 export const userApi = createApi({
   reducerPath: "userApi",
@@ -21,7 +22,7 @@ export const userApi = createApi({
     //         ]
     //       : ["Post"],
     // }),
-    getUserByUsername: builder.query({
+    getUserByUsername: builder.query<IFullUserResponse, string | undefined>({
       query: (username) => ({
         url: `/user/${username}`,
       }),
