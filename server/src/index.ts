@@ -20,6 +20,7 @@ import commentRouter from "./router/comment";
 import userRouter from "./router/user";
 import conversationRouter from "./router/conversation";
 import messageRouter from "./router/message";
+import notificationRouter from "./router/notification";
 
 import connectDB from "./db/connect";
 
@@ -34,6 +35,7 @@ app.use("/api/v1/comment", commentRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/conversation", conversationRouter);
 app.use("/api/v1/message", messageRouter);
+app.use("/api/v1/notification", notificationRouter);
 
 const PORT = process.env.PORT || 4000;
 

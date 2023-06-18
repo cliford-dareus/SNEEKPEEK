@@ -11,10 +11,23 @@ import {
 import UserProfile from "../../assets/user.jpg";
 import { Flex } from "../../lib/styled-component/styles";
 import { useAppSelector } from "../../app/hooks";
-import { RootState } from "../../app/store";
+import { useGetNotificationsQuery } from "../../features/api/notification";
+import { selectCurrentUser } from "../../features/slice/authSlice";
+import { useEffect } from "react";
+import { LoaderContainer } from "../../pages/Profile";
+import Loader from "../../components/UI/Loader";
 
 const index = () => {
-  const user = useAppSelector((state: RootState) => state.auth.user?.username )
+  const user = useAppSelector(selectCurrentUser);
+  const { data, isLoading, refetch } = useGetNotificationsQuery(
+    {},
+    { skip: !user }
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [user.token]);
+
   return (
     <SidebarContainer>
       <Navigation>
@@ -34,14 +47,14 @@ const index = () => {
             </NavigationLink>
           </NavigationListItem>
           <NavigationListItem>
-            <NavigationLink to={`${user}`}>
+            <NavigationLink to={`${user.user?.username}`}>
               <Icon>
                 <BsPeople />
               </Icon>
             </NavigationLink>
           </NavigationListItem>
           <NavigationListItem>
-            <NavigationLink to=''>
+            <NavigationLink to="">
               <Icon>
                 <BsLightningCharge />
               </Icon>
@@ -83,26 +96,32 @@ const index = () => {
                 <BsThreeDots />
               </Icon>
             </Flex>
-            <SideContainer>
-              {Array(3)
-                .fill(0)
-                .map((_) => (
-                  <SideNewActivityCard>
-                    <img src={UserProfile} alt="" />
-                    <SideContentActivityCardText>
-                      <span>James Rodrigez</span>
-                      <p>Follows you</p>
-                    </SideContentActivityCardText>
-                    <SideContentActivityBtn>
-                      <BsPersonAdd />
-                    </SideContentActivityBtn>
-                  </SideNewActivityCard>
-                ))}
-            </SideContainer>
+            {user.token && (
+              <SideContainer>
+                {!isLoading ? data?.notifications.length !== 0 ? (
+                  data?.notifications.map((notification: any) => (
+                    <SideNewActivityCard key={notification?._id}>
+                      <img src={UserProfile} alt="" />
+                      <SideContentActivityCardText>
+                        <span>{notification?.sender.username}</span>
+                        <p>Follows you</p>
+                      </SideContentActivityCardText>
+                      <SideContentActivityBtn>
+                        <BsPersonAdd />
+                      </SideContentActivityBtn>
+                    </SideNewActivityCard>
+                  ))
+                ) : (
+                  <h3>No new Notification</h3>
+                ) : (
+                  <LoaderContainer>
+                    <Loader />
+                  </LoaderContainer>
+                )}
+              </SideContainer>
+            )}
           </SideNewActivity>
         </SideContentActivity>
-
-        <SideGroupContainer>{/* <h2>Groups</h2> */}</SideGroupContainer>
       </SideContentContainer>
     </SidebarContainer>
   );
@@ -179,7 +198,7 @@ const SideContentContainer = styled.div`
 const SideContentActivity = styled.div`
   width: 100%;
   /* border-bottom: 1px solid; */
-  h2{
+  h2 {
     font-weight: 600;
     font-size: 1.333rem;
   }
@@ -241,9 +260,4 @@ const SideContentActivityBtn = styled.div`
   align-items: center;
   background-color: var(--primary--color-400);
   border-radius: 50%;
-`;
-//New Activity End
-
-const SideGroupContainer = styled.div`
-  margin-top: 1em;
 `;

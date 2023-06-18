@@ -16,7 +16,7 @@ import {
 } from "../../features/api/message";
 import { selectCurrentUser } from "../../features/slice/authSlice";
 import { useGetConversationsQuery } from "../../features/api/conversations";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 interface IMessage {
   status: string | undefined;
@@ -44,7 +44,7 @@ const index = () => {
   useEffect(() => {
     if (data?.message?.messages === undefined) {
       setMessages([]);
-    }else{
+    } else {
       setMessages(data?.message?.messages);
     }
   }, [data]);

@@ -170,7 +170,7 @@ const followUser = async (req: Request, res: Response) => {
     }
 
     checkUserIdentity({
-      userTofollowId: String(userToFollow._id),
+      userTofollowId: userToFollow._id as unknown as string,
       currentUserId: id,
       res,
     });
@@ -212,7 +212,7 @@ const acceptRequest = async (req: Request, res: Response) => {
     }
 
     checkUserIdentity({
-      userTofollowId: String(userToAccept._id),
+      userTofollowId: userToAccept._id as unknown as string,
       currentUserId: id,
       res,
     });
@@ -272,7 +272,7 @@ const declineRequest = async (req: Request, res: Response) => {
     }
 
     checkUserIdentity({
-      userTofollowId: String(userToAccept._id),
+      userTofollowId: userToAccept._id as unknown as string,
       currentUserId: id,
       res,
     });

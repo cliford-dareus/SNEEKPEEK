@@ -7,6 +7,7 @@ import {
   removeCredentials,
   setCredentials,
 } from "../../features/slice/authSlice";
+import { socketConnect } from "../socket/config";
 
 const useRefreshToken = () => {
   const auth = useAuth();
@@ -37,6 +38,7 @@ const useRefreshToken = () => {
   useEffect(() => {
     let refreshAccessTokenTimerId: any;
     if (auth.token) {
+      socketConnect(auth)
       refreshAccessTokenTimerId = setTimeout(() => {
         refreshAccessToken();
       }, new Date(auth.expiresAt).getTime() - Date.now() - 10 * 1000);

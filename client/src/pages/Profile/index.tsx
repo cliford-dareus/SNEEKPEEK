@@ -13,12 +13,13 @@ import { socket } from "../../lib/socket/config";
 import { selectCurrentUser } from "../../features/slice/authSlice";
 import { useEffect } from "react";
 import { IFullUserResponse } from "../../utils/types/types";
+import toast  from "react-hot-toast";
 
 const index = () => {
   const { name } = useParams();
   const user = useAppSelector(selectCurrentUser);
   const [followUser] = useFollowUserMutation();
-  const { data: currentUser, refetch } = useGetUserByUsernameQuery(name, {
+  const { data: currentUser } = useGetUserByUsernameQuery(name, {
     refetchOnMountOrArgChange: true,
   });
 
@@ -27,24 +28,19 @@ const index = () => {
       await followUser({ username: name });
 
       socket.emit("notification", {
-        sender: { userId: user.user?.userId, username: user.user?.username },
+        sender: {
+          userId: user.user?.userId,
+          username: user.user?.username,
+        },
         target: {
           userId: currentUser?.user._id,
           username: currentUser?.user.username,
         },
         type: "FOLLOW",
-        message: "You are now following " + name,
+        message: "is following you " + name,
       });
     } catch (error) {}
   };
-
-  useEffect(() => {
-    socket.on("notification", ({ sender, target, type, message }) => {
-      if (target.userId === user.user?.userId) {
-        refetch();
-      }
-    });
-  }, []);
 
   return (
     <div style={{ flex: "1", display: "flex", gap: "1em" }}>

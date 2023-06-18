@@ -5,6 +5,9 @@ import Loader from "../../components/UI/Loader";
 import Card from "../../components/UI/Card";
 import { useAuth } from "../../lib/hooks/useAuth";
 import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
+import { useEffect } from "react";
+import { socket } from "../../lib/socket/config";
+import { toast } from "react-hot-toast";
 // import { motion } from "framer-motion";
 
 const index = () => {
@@ -18,6 +21,14 @@ const index = () => {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   };
+
+  useEffect(() => {
+    socket.on("notification", ({ sender, target, type, message }) => {
+      if (target.userId === auth.user?.userId) {
+        toast(sender.username + " " + message);
+      }
+    });
+  }, []);
 
   return (
     <PageContainer>

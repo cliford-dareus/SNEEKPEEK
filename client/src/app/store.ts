@@ -9,6 +9,7 @@ import { commentApi } from "../features/api/comment";
 import { userApi } from "../features/api/user";
 import { conversationApi } from "../features/api/conversations";
 import { messageApi } from "../features/api/message";
+import { notificationApi } from "../features/api/notification";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [conversationApi.reducerPath]: conversationApi.reducer,
     [messageApi.reducerPath]: messageApi.reducer,
+    [notificationApi.reducerPath]: notificationApi.reducer,
     auth: authReducer,
     messages: messageReducer,
   },
@@ -28,7 +30,8 @@ export const store = configureStore({
       commentApi.middleware,
       userApi.middleware,
       conversationApi.middleware,
-      messageApi.middleware
+      messageApi.middleware,
+      notificationApi.middleware,
     ),
 });
 

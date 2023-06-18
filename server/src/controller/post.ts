@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { User } from "../models/User";
 import Comment from "../models/Comment";
-import { IComment } from "../types/typing";
 import { ObjectId } from "mongoose";
 
 //Create Post
@@ -103,7 +102,7 @@ const deletePost = async (req: Request, res: Response) => {
   }
 };
 
-// Like Post
+// Like Post or Unlike Post
 const likeOrUnlikePost = async (req: Request, res: Response) => {
   const { postId } = req.params;
   const id = req.user;
@@ -119,7 +118,7 @@ const likeOrUnlikePost = async (req: Request, res: Response) => {
 
     if (post.likes.includes(id)) {
       await post.updateOne({ $pull: { likes: id } });
-      
+
       res.status(StatusCodes.OK).json({
         status: StatusCodes.OK,
         message: "Post unliked",
@@ -159,7 +158,7 @@ const getAllPost = async (req: Request, res: Response) => {
   }
 };
 
-// Get Friends and Personal Posts
+// Get User Post
 const getUserPost = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
@@ -183,6 +182,15 @@ const getUserPost = async (req: Request, res: Response) => {
 };
 
 // Get Tagged In Posts
+const getTaggedInPosts = async (req: Request, res: Response) => {
+  try {
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
+};
 
 // Get Post by id and comment fill with users username and pic
 const getPostwithCommment = async (req: Request, res: Response) => {
@@ -213,7 +221,12 @@ const getPostwithCommment = async (req: Request, res: Response) => {
       message: "",
       comment,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
 };
 
 export {
