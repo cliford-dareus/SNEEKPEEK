@@ -243,6 +243,11 @@ const acceptRequest = async (req: Request, res: Response) => {
       $inc: { followingsLength: 1 },
     });
 
+    await Notification.updateOne(
+      { sender: userToAccept._id, target: currentUser._id },
+      { status: "READ" }
+    );
+
     console.log("USER ID 3" + userToAcceptId);
 
     res.status(StatusCodes.OK).json({

@@ -14,7 +14,7 @@ export interface IMessage {
 
 export enum status {
   READ,
-  RECIEVE,
+  RECIEVED,
   DELIVERED,
 }
 
@@ -94,6 +94,7 @@ export interface INotification {
   sender: ObjectId;
   target: ObjectId;
   type: TYPE;
+  status: status;
 }
 
 enum TYPE {

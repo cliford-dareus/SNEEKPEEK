@@ -15,7 +15,10 @@ import { Link } from "react-router-dom";
 
 const index = () => {
   const user = useAppSelector(selectCurrentUser) as IAuthInitialState;
-  const { data: conversations, isLoading } = useGetConversationsQuery({});
+  const { data: conversations, isLoading } = useGetConversationsQuery(
+    {},
+    { refetchOnMountOrArgChange: true }
+  );
   const { data: currentUserData } = useGetUserByUsernameQuery(
     user?.user?.username
   );
@@ -68,7 +71,7 @@ const index = () => {
                 return (
                   <Link to={`chat/${friend[0].username}/${con._id}`}>
                     <p>{friend[0].username}</p>
-                    {/* Add the laast Message */}
+                    <p>{con.lastmessage}</p>
                   </Link>
                 );
               })}

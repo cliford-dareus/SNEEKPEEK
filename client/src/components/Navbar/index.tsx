@@ -131,6 +131,7 @@ const HeaderInput = styled.input`
     background-color: transparent;
     color: white;
     margin-right: auto;
+    font-size: 0.8125rem;
     /* padding-inline: 1em; */
     flex: 1;
   }

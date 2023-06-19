@@ -16,13 +16,31 @@ import { selectCurrentUser } from "../../features/slice/authSlice";
 import { useEffect } from "react";
 import { LoaderContainer } from "../../pages/Profile";
 import Loader from "../../components/UI/Loader";
+import { useAcceptRequestMutation } from "../../features/api/user";
+import { socket } from "../../lib/socket/config";
+import { toast } from "react-hot-toast";
 
 const index = () => {
   const user = useAppSelector(selectCurrentUser);
+  const [acceptRequest] = useAcceptRequestMutation();
   const { data, isLoading, refetch } = useGetNotificationsQuery(
     {},
     { skip: !user }
   );
+
+  const handleAcceptRequest = async (id: string) => {
+    await acceptRequest(id);
+    refetch();
+  };
+
+  useEffect(() => {
+    socket.on("notification", ({ sender, target, type, message }) => {
+      if (target.userId === user.user?.userId) {
+        toast(sender.username + " " + message);
+        refetch();
+      }
+    });
+  }, []);
 
   useEffect(() => {
     refetch();
@@ -98,21 +116,33 @@ const index = () => {
             </Flex>
             {user.token && (
               <SideContainer>
-                {!isLoading ? data?.notifications.length !== 0 ? (
-                  data?.notifications.map((notification: any) => (
-                    <SideNewActivityCard key={notification?._id}>
-                      <img src={UserProfile} alt="" />
-                      <SideContentActivityCardText>
-                        <span>{notification?.sender.username}</span>
-                        <p>Follows you</p>
-                      </SideContentActivityCardText>
-                      <SideContentActivityBtn>
-                        <BsPersonAdd />
-                      </SideContentActivityBtn>
-                    </SideNewActivityCard>
-                  ))
-                ) : (
-                  <h3>No new Notification</h3>
+                {!isLoading ? (
+                  data?.notifications.length !== 0 ? (
+                    data?.notifications.map((notification: any) => (
+                      <SideNewActivityCard
+                        key={notification?._id}
+                        $status={notification.status}
+                      >
+                        <img src={UserProfile} alt="" />
+                        <SideContentActivityCardText
+                          $status={notification.status}
+                        >
+                          <span>{notification?.sender.username}</span>
+                          <p>Follows you</p>
+                        </SideContentActivityCardText>
+                        <SideContentActivityBtn
+                          $status={notification.status}
+                          onClick={() =>
+                            handleAcceptRequest(notification.sender._id)
+                          }
+                        >
+                          <BsPersonAdd />
+                        </SideContentActivityBtn>
+                      </SideNewActivityCard>
+                    ))
+                  ) : (
+                    <h3>No new Notification</h3>
+                  )
                 ) : (
                   <LoaderContainer>
                     <Loader />
@@ -225,7 +255,11 @@ const SideContainer = styled.div`
   height: 150px;
 `;
 
-const SideNewActivityCard = styled.div`
+interface IProps {
+  readonly $status: string;
+}
+
+const SideNewActivityCard = styled.div<IProps>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -239,25 +273,32 @@ const SideNewActivityCard = styled.div`
   }
 `;
 
-const SideContentActivityCardText = styled.div`
+const SideContentActivityCardText = styled.div<IProps>`
   margin-left: 0.5em;
   margin-right: auto;
 
   span {
     font-weight: 600;
+    color: ${(props) =>
+      props.$status === "READ" ? "var(--light--color-600)" : ""};
   }
 
   p {
     font-size: 0.86rem;
+    color: ${(props) =>
+      props.$status === "READ" ? "var(--light--color-600)" : ""};
   }
 `;
 
-const SideContentActivityBtn = styled.div`
+const SideContentActivityBtn = styled.div<IProps>`
   width: 25px;
   aspect-ratio: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--primary--color-400);
+  background-color: ${(props) =>
+    props.$status === "READ"
+      ? "var(--light--color-600)"
+      : "var(--primary--color-400)"};
   border-radius: 50%;
 `;
