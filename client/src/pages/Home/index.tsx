@@ -10,7 +10,7 @@ import { socket } from "../../lib/socket/config";
 import { toast } from "react-hot-toast";
 // import { motion } from "framer-motion";
 
-const index = () => {
+const Index = () => {
   const auth = useAuth();
   const { data, isLoading, isError } = useGetPostQuery("");
 
@@ -68,4 +68,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

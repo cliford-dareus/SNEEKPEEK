@@ -1,12 +1,11 @@
 import { Flex } from "../../lib/styled-component/styles";
-import styled from "styled-components";
 import SideContent from "../SideContent";
 import Explore from "../../pages/Home";
-import { NavLink, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useAuth } from "../../lib/hooks/useAuth";
 import { useGetUserByUsernameQuery } from "../../features/api/user";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { ActiveIndicator, DashboardLayoutContainer, SideContentMenu, SideContntBtn } from "./styles";
 
 const links = [
   { id: 1, to: ".", title: "Trending" },
@@ -14,7 +13,7 @@ const links = [
   { id: 3, to: "request", title: "Requests" },
 ];
 
-const index = () => {
+const Index = () => {
   const [activeTab, setActiveTab] = useState<number>(links[0].id);
   const auth = useAuth();
   const { data: currentUser } = useGetUserByUsernameQuery(
@@ -61,34 +60,4 @@ const index = () => {
   );
 };
 
-export default index;
-
-const DashboardLayoutContainer = styled.div`
-  flex: 1;
-`;
-
-const SideContentMenu = styled.ul`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 40px;
-  margin-bottom: 1em;
-`;
-
-const SideContntBtn = styled(NavLink)`
-  outline: none;
-  border: none;
-  padding: 0.3em 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: white;
-`;
-
-const ActiveIndicator = styled(motion.div)`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: white;
-`;
+export default Index;

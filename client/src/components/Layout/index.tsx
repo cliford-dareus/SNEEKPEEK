@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import Navbar from "../Navbar";
-import styled from "styled-components";
+import { Container, MainContainer } from "./styles";
 
 
-const index = () => {
+const Index = () => {
   
 
   return (
@@ -18,24 +18,4 @@ const index = () => {
   );
 };
 
-export default index;
-
-const Container = styled.div`
-  margin-inline: 2%;
-  
-  @media screen and (min-width: 425px){
-    margin-inline: 4%;
-  }
-
-  @media screen and (min-width: 1028px){
-    margin-inline: 7%;
-  }
-`;
-
-const MainContainer = styled.div`
-  display: flex;
-  gap: 1em;
-  margin-top: 1em;
-  height: calc(100vh - 60px - 1em);
-`;
-
+export default Index;

@@ -20,7 +20,7 @@ import { useAcceptRequestMutation } from "../../features/api/user";
 import { socket } from "../../lib/socket/config";
 import { toast } from "react-hot-toast";
 
-const index = () => {
+const Index = () => {
   const user = useAppSelector(selectCurrentUser);
   const [acceptRequest] = useAcceptRequestMutation();
   const { data, isLoading, refetch } = useGetNotificationsQuery(
@@ -157,7 +157,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 //
 const Icon = styled.span`
@@ -169,7 +169,7 @@ const Icon = styled.span`
 const SidebarContainer = styled.aside`
   display: none;
 
-  @media screen and (min-width: 635px) {
+  @media screen and (min-width: 640px) {
     width: 49px;
     min-width: 49px;
     height: 50%;
