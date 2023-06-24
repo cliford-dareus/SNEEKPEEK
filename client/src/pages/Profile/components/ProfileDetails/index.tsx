@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Flex } from "../../../../lib/styled-component/styles";
 import { IFullUserResponse } from "../../../../utils/types/types";
 
-const index = ({ currentUser }: { currentUser: IFullUserResponse }) => {
+const Index = ({ currentUser }: { currentUser: IFullUserResponse }) => {
   return (
     <ProfileDetails>
       <>
@@ -48,7 +48,7 @@ const index = ({ currentUser }: { currentUser: IFullUserResponse }) => {
   );
 };
 
-export default index;
+export default Index;
 
 const ProfileDetails = styled.div`
   margin-top: 4.5em;

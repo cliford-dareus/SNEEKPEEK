@@ -5,7 +5,7 @@ import { IPost } from "../../../../utils/types/types";
 import { LoaderContainer } from "../..";
 import Loader from '../../../../components/UI/Loader'
 
-const index = () => {
+const Index = () => {
   const { name } = useParams();
   const { data, isLoading } = useGetPostQuery({});
 
@@ -30,4 +30,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

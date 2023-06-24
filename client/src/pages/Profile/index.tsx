@@ -11,11 +11,9 @@ import {
 } from "../../features/api/user";
 import { socket } from "../../lib/socket/config";
 import { selectCurrentUser } from "../../features/slice/authSlice";
-import { useEffect } from "react";
 import { IFullUserResponse } from "../../utils/types/types";
-import toast  from "react-hot-toast";
 
-const index = () => {
+const Index = () => {
   const { name } = useParams();
   const user = useAppSelector(selectCurrentUser);
   const [followUser] = useFollowUserMutation();
@@ -39,7 +37,9 @@ const index = () => {
         type: "FOLLOW",
         message: "is following you " + name,
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -104,7 +104,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 const ProfileHeader = styled.div`
   position: relative;

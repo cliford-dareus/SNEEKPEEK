@@ -5,7 +5,7 @@ import { useAppSelector } from "../../../app/hooks";
 import { selectCurrentUser } from "../../../features/slice/authSlice";
 import { useGetConversationsQuery } from "../../../features/api/conversations";
 
-const index = () => {
+const Index = () => {
   const user = useAppSelector(selectCurrentUser);
   const [message, setMessage] = useState<string[]>([]);
   // const { data: conversations, isLoading } = useGetConversationsQuery({});
@@ -32,4 +32,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
