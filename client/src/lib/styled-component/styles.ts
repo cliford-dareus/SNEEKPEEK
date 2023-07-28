@@ -17,6 +17,8 @@ export const PageContainer = styled(motion.div)`
   overscroll-behavior-y: contain;
   overflow-y: scroll;
   position: relative;
+  max-width: 500px;
+  min-width: 300px;
 
    &::-webkit-scrollbar{
     display: none;

@@ -5,7 +5,7 @@ import { useAppSelector } from "../../app/hooks";
 import { selectCurrentUser } from "../../features/slice/authSlice";
 import React from "react";
 
-const index = ({ children }: { children: React.ReactNode }) => {
+const Index = ({ children }: { children: React.ReactNode }) => {
   const isLogin = useAppSelector(selectCurrentUser).token;
 
   return (
@@ -24,7 +24,7 @@ const index = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default index;
+export default Index;
 
 const SideContentContainer = styled.aside`
   display: none;
@@ -32,7 +32,9 @@ const SideContentContainer = styled.aside`
   @media screen and (min-width: 855px) {
     display: block;
     border-radius: 10px;
-    width: 350px;
+    min-width: 280px;
+    max-width: 300px;
+    flex: 1;
   }
 `;
 

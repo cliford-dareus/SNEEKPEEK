@@ -4,7 +4,7 @@ import { useGetUserPostQuery } from "../../../../features/api/post";
 import Loader from "../../../../components/UI/Loader";
 import { LoaderContainer } from "../../index";
 
-const index = () => {
+const Index = () => {
   const { name } = useParams();
   const { data: post, isLoading } = useGetUserPostQuery(name);
 
@@ -21,4 +21,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

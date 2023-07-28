@@ -8,7 +8,7 @@ interface IProp {
   data: { searchTerm: string };
 }
 
-const index = ({ data }: IProp) => {
+const Index = ({ data }: IProp) => {
   const Navigate = useNavigate()
   const [createConversation] = useCreateConversationMutation();
   const { data: users, isLoading } = useSearchUserQuery({
@@ -34,7 +34,7 @@ const index = ({ data }: IProp) => {
   );
 };
 
-export default index;
+export default Index;
 
 const ReciepientPickerModal = styled.div`
   position: absolute;

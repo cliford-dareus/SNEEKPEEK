@@ -7,7 +7,7 @@ import { useAppSelector } from "../../../app/hooks";
 import { selectCurrentUser } from "../../../features/slice/authSlice";
 import { socket } from "../../../lib/socket/config";
 
-const index: FC<{ req: IRequestData }> = ({ req }) => {
+const Index: FC<{ req: IRequestData }> = ({ req }) => {
   const [accept] = useAcceptRequestMutation();
   const user = useAppSelector(selectCurrentUser);
 
@@ -52,7 +52,7 @@ const index: FC<{ req: IRequestData }> = ({ req }) => {
   );
 };
 
-export default index;
+export default Index;
 
 const RequestImage = styled.div`
   width: 35px;

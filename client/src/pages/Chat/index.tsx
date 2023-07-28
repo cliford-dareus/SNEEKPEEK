@@ -25,7 +25,7 @@ interface IMessage {
   sender: { _id: string | undefined; username: string | undefined };
 }
 
-const index = () => {
+const Index = () => {
   const { id, name } = useParams();
   const user = useAppSelector(selectCurrentUser) as IAuthInitialState;
 
@@ -255,7 +255,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 export const InputContainer = styled.div`
   display: flex;

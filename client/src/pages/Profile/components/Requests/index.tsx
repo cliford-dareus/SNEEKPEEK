@@ -3,7 +3,7 @@ import RequestCard from "../../../../components/UI/RequestCard";
 import { IRequestData } from "../../../../utils/types/types";
 
 
-const index = () => {
+const Index = () => {
   const { user } = useOutletContext() as any;
 
   return (
@@ -15,4 +15,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
