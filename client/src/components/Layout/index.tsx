@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "../Sidebar";
-import Navbar from "../Navbar";
+import Sidebar from "../UI/Sidebar";
+import Navbar from "../UI/Navbar";
 import styled from "styled-components";
 
 

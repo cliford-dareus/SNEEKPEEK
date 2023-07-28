@@ -2,7 +2,12 @@ import ms from "ms";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import { Token } from "../models/Token";
-import { ICreateJwtPayLoad, IJwtUser, IUserTokenPayLoad, UserToken } from "../types/typing";
+import {
+  ICreateJwtPayLoad,
+  IJwtUser,
+  IUserTokenPayLoad,
+  UserToken,
+} from "../types/typing";
 
 export const jwtVerify = ({ payload }: { payload: string }) => {
   return jwt.verify(payload, process.env.JWT_SECRET!) as IJwtUser;

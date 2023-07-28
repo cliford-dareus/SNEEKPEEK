@@ -3,6 +3,7 @@ import { useAppSelector } from "../../app/hooks";
 import SideContent from "../../components/SideContent";
 import styled from "styled-components";
 import Button from "../../components/UI/Button";
+import BackButton from "../../components/UI/BackButton";
 import ProfileDetails from "./components/ProfileDetails";
 import { Link, Outlet, useParams } from "react-router-dom";
 import {
@@ -11,9 +12,7 @@ import {
 } from "../../features/api/user";
 import { socket } from "../../lib/socket/config";
 import { selectCurrentUser } from "../../features/slice/authSlice";
-import { useEffect } from "react";
 import { IFullUserResponse } from "../../utils/types/types";
-import toast  from "react-hot-toast";
 
 const index = () => {
   const { name } = useParams();
@@ -45,7 +44,10 @@ const index = () => {
   return (
     <div style={{ flex: "1", display: "flex", gap: "1em" }}>
       <PageContainer>
-        <PageTitle>
+        <PageTitle
+          style={{ display: "flex", alignItems: "center", gap: "1em" }}
+        >
+          <BackButton />
           <h1>{currentUser?.user.username}</h1>
         </PageTitle>
 

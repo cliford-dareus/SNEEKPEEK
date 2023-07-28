@@ -5,6 +5,7 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { useAppSelector } from "../../app/hooks";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import Button from "../../components/UI/Button";
+import BackButton from "../../components/UI/BackButton";
 import SideContent from "../../components/SideContent";
 import { socket, socketConnect } from "../../lib/socket/config";
 import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
@@ -124,7 +125,10 @@ const index = () => {
   return (
     <div style={{ flex: "1", display: "flex", gap: "1em", overflow: "hidden" }}>
       <PageContainer style={{ display: "flex", flexDirection: "column" }}>
-        <PageTitle>
+        <PageTitle
+          style={{ display: "flex", alignItems: "center", gap: "1em" }}
+        >
+          <BackButton />
           <h1>{name}</h1>
         </PageTitle>
 

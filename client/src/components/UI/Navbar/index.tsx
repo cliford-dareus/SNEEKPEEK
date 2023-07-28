@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import { BsSearch, BsChat, BsBell, BsChevronDown } from "react-icons/bs";
 
 import styled from "styled-components";
-import SneekLogo from "../../assets/Sneekpeek.svg";
-import Profile from "../../assets/user.jpg";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { useSignOutUserMutation } from "../../features/api/auth";
-import { removeCredentials, selectCurrentUser } from "../../features/slice/authSlice";
+import SneekLogo from "../../../assets/Sneekpeek.svg";
+import Profile from "../../../assets/user.jpg";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { useSignOutUserMutation } from "../../../features/api/auth";
+import { removeCredentials, selectCurrentUser } from "../../../features/slice/authSlice";
 
 const index = () => {
   const dispatch = useAppDispatch();

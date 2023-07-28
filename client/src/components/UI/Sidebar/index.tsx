@@ -8,16 +8,16 @@ import {
   BsPersonAdd,
   BsThreeDots,
 } from "react-icons/bs";
-import UserProfile from "../../assets/user.jpg";
-import { Flex } from "../../lib/styled-component/styles";
-import { useAppSelector } from "../../app/hooks";
-import { useGetNotificationsQuery } from "../../features/api/notification";
-import { selectCurrentUser } from "../../features/slice/authSlice";
+import UserProfile from "../../../assets/user.jpg";
+import { Flex } from "../../../lib/styled-component/styles";
+import { useAppSelector } from "../../../app/hooks";
+import { useGetNotificationsQuery } from "../../../features/api/notification";
+import { selectCurrentUser } from "../../../features/slice/authSlice";
 import { useEffect } from "react";
-import { LoaderContainer } from "../../pages/Profile";
-import Loader from "../../components/UI/Loader";
-import { useAcceptRequestMutation } from "../../features/api/user";
-import { socket } from "../../lib/socket/config";
+import { LoaderContainer } from "../../../pages/Profile";
+import Loader from "../Loader";
+import { useAcceptRequestMutation } from "../../../features/api/user";
+import { socket } from "../../../lib/socket/config";
 import { toast } from "react-hot-toast";
 
 const index = () => {
