@@ -2,21 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { BsSearch, BsChat, BsBell, BsChevronDown } from "react-icons/bs";
 
-<<<<<<< HEAD:client/src/components/UI/Navbar/index.tsx
-import styled from "styled-components";
 import SneekLogo from "../../../assets/Sneekpeek.svg";
 import Profile from "../../../assets/user.jpg";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { useSignOutUserMutation } from "../../../features/api/auth";
 import { removeCredentials, selectCurrentUser } from "../../../features/slice/authSlice";
-=======
-import SneekLogo from "../../assets/Sneekpeek.svg";
-import Profile from "../../assets/user.jpg";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { useSignOutUserMutation } from "../../features/api/auth";
-import { removeCredentials, selectCurrentUser } from "../../features/slice/authSlice";
 import { Header, HeaderActions, HeaderInput, HeaderInputContainer, HeaderProfileContainer, HeaderProfileModal, Icon, LogoContainer } from "./styles";
->>>>>>> f7d35157d7acdcff195926d75b36b07504b429b6:client/src/components/Navbar/index.tsx
 
 const Index = () => {
   const dispatch = useAppDispatch();
