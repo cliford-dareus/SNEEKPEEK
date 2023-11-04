@@ -1,7 +1,7 @@
 import { Container } from "../../../lib/styled-component/styles";
 
-const index = () => {
+const Index = () => {
   return <Container>Mention</Container>;
 };
 
-export default index;
+export default Index;

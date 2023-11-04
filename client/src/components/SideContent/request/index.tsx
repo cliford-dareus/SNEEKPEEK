@@ -3,7 +3,7 @@ import { Container } from "../../../lib/styled-component/styles";
 import RequestCard from "../../UI/RequestCard";
 import { IRequestData } from "../../../utils/types/types";
 
-const index = () => {
+const Index = () => {
   const { user } = useOutletContext() as any;
 
   return (
@@ -17,4 +17,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

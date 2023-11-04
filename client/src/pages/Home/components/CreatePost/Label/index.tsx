@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import styled from "styled-components";
 
-const index = ({
+const Index = ({
   icon,
   label,
   type,
@@ -36,7 +36,7 @@ const index = ({
   );
 };
 
-export default index;
+export default Index;
 
 const Label = styled.label`
   display: flex;

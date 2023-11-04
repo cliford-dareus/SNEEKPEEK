@@ -1,7 +1,7 @@
 import styled, { keyframes } from "styled-components";
 
 
-const index = () => {
+const Index = () => {
   return (
     <svg
       viewBox="0 0 79 31"
@@ -35,7 +35,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 const dash = keyframes`
     from {

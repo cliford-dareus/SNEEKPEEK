@@ -12,7 +12,7 @@ import { setCredentials } from "../../../features/slice/authSlice";
 import { useAppDispatch } from "../../../app/hooks";
 import { socketConnect } from "../../../lib/socket/config";
 
-const index = () => {
+const Index = () => {
   const dispatch = useAppDispatch();
   const [loginUser, { isLoading }] = useSignInUserMutation();
   const navigate = useNavigate();
@@ -43,7 +43,9 @@ const index = () => {
         expiresAt: data.user.expiresAt,
       });
       navigate("/", { replace: true });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -73,4 +75,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

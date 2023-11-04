@@ -8,7 +8,7 @@ import {
 } from "../../../lib/styled-component/styles";
 import { useSignUpUserMutation } from "../../../features/api/auth";
 
-const index = () => {
+const Index = () => {
   const [signUpUser, { isLoading }] =
     useSignUpUserMutation();
   const [userInfo, setUserInfo] = useState<IRegisterPayload>({
@@ -34,7 +34,7 @@ const index = () => {
       await signUpUser(userInfo);
       setUserInfo({username: '', name: '', password: '', email: ''})
     } catch (error) {
-
+      console.log(error);
     }
   };
 
@@ -83,4 +83,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

@@ -9,7 +9,7 @@ interface Iprop {
   handleInput: any;
 }
 
-const index = ({ setOpenModal, value, handleInput }: Iprop) => {
+const Index = ({ setOpenModal, value, handleInput }: Iprop) => {
   return (
     <CreatePostModalContainer>
       <Button onClick={() => setOpenModal(false)}>
@@ -34,7 +34,7 @@ const index = ({ setOpenModal, value, handleInput }: Iprop) => {
   );
 };
 
-export default index;
+export default Index;
 
 const CreatePostModalContainer = styled.div`
   position: absolute;

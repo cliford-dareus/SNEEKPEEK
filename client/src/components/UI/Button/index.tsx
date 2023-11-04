@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import Loader from "../Loader";
 
-const index = ({
+const Index = ({
   label,
   isLoading,
   color,
@@ -24,7 +24,7 @@ const index = ({
   );
 };
 
-export default index;
+export default Index;
 
 interface BgProp {
   readonly $bg: boolean | undefined;

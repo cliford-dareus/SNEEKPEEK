@@ -17,7 +17,23 @@ import Loader from "../../components/UI/Loader";
 import { useAcceptRequestMutation } from "../../features/api/user";
 import { socket } from "../../lib/socket/config";
 import { toast } from "react-hot-toast";
-import { Icon, Navigation, NavigationLink, NavigationList, NavigationListItem, SideActivity, SideContainer, SideContentActivity, SideContentActivityBtn, SideContentActivityCardText, SideContentContainer, SideContentSubTitle, SideNewActivity, SideNewActivityCard, SidebarContainer } from "./styles";
+import {
+  Icon,
+  Navigation,
+  NavigationLink,
+  NavigationList,
+  NavigationListItem,
+  SideActivity,
+  SideContainer,
+  SideContentActivity,
+  SideContentActivityBtn,
+  SideContentActivityCardText,
+  SideContentContainer,
+  SideContentSubTitle,
+  SideNewActivity,
+  SideNewActivityCard,
+  SidebarContainer,
+} from "./styles";
 
 const Index = () => {
   const user = useAppSelector(selectCurrentUser);

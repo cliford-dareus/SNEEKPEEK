@@ -6,7 +6,7 @@ import {
 } from "../../lib/styled-component/styles";
 import Image from "../../assets/Instagram post - 1.png";
 
-const index = () => {
+const Index = () => {
   return (
     <AuthPageContainer>
       <AuthPageImageContainer>
@@ -20,4 +20,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

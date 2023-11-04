@@ -3,7 +3,7 @@ import { useGetPostWithCommentQuery } from "../../../../features/api/comment";
 import Loader from "../../../../components/UI/Loader";
 import { Link } from "react-router-dom";
 
-const index = ({ postId }: { postId: string }) => {
+const Index = ({ postId }: { postId: string }) => {
   const { data, isLoading } = useGetPostWithCommentQuery(postId);
 
   return (
@@ -40,7 +40,7 @@ const index = ({ postId }: { postId: string }) => {
   );
 };
 
-export default index;
+export default Index;
 
 const CommentCardContainer = styled.div`
   padding: 0.5em 1em;

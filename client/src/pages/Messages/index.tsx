@@ -13,7 +13,7 @@ import SearchModal from "../../components/UI/SearchModal";
 import { socketConnect } from "../../lib/socket/config";
 import { Link } from "react-router-dom";
 
-const index = () => {
+const Index = () => {
   const user = useAppSelector(selectCurrentUser) as IAuthInitialState;
   const { data: conversations, isLoading } = useGetConversationsQuery(
     {},
@@ -138,7 +138,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 const SideFriendContainer = styled.div``;
 

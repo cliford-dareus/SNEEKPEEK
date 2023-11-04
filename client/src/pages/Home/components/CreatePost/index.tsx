@@ -11,7 +11,7 @@ interface IPost {
   image: string;
 }
 
-const index = () => {
+const Index = () => {
   const [createPost] = usePostMutation();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [post, setPost] = useState<IPost>({
@@ -72,7 +72,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
 
 const CreatePostContainer = styled.div`
   background-color: var(--dark--color-800);

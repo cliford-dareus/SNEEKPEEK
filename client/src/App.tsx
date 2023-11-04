@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
@@ -25,7 +24,7 @@ import { selectCurrentUser } from "./features/slice/authSlice";
 
 function App() {
   const _ = useRefreshToken();
-  const user = useAppSelector(selectCurrentUser);
+  // const user = useAppSelector(selectCurrentUser);
 
   return (
     <>
