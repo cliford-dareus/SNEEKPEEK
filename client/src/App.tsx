@@ -19,11 +19,9 @@ import DashboardLayout from "./components/DashboardLayout";
 import useRefreshToken from "./lib/hooks/useRefreshToken";
 import { GlobalStyles } from "./lib/styled-component/globalStyles";
 import { PrivateOutlet } from "./utils/Private/PrivateOutlet";
-import { useAppSelector } from "./app/hooks";
-import { selectCurrentUser } from "./features/slice/authSlice";
 
 function App() {
-  const _ = useRefreshToken();
+  useRefreshToken();
   // const user = useAppSelector(selectCurrentUser);
 
   return (

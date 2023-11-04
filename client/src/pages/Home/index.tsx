@@ -23,7 +23,7 @@ const Index = () => {
   };
 
   useEffect(() => {
-    socket.on("notification", ({ sender, target, type, message }) => {
+    socket.on("notification", ({ sender, target, message }) => {
       if (target.userId === auth.user?.userId) {
         toast(sender.username + " " + message);
       }

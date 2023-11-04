@@ -1,7 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import authReducer from "../features/slice/authSlice";
-import messageReducer from "../features/slice/messageSlice";
 
 import { authApi } from "../features/api/auth";
 import { postApi } from "../features/api/post";
@@ -21,7 +20,6 @@ export const store = configureStore({
     [messageApi.reducerPath]: messageApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
     auth: authReducer,
-    messages: messageReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

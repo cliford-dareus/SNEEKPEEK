@@ -61,7 +61,7 @@ const Index = ({ post }: { post: IPost }) => {
         <CardContentTop>
           <Link to={`${post.author.username}`} style={{ color: "inherit" }}>
             <CardName>{post.author.username}</CardName>
-            <CardDate>{getElaspeTime(post.createdAt)} ago</CardDate>
+            <CardDate>{getElaspeTime(new Date(post.createdAt))} ago</CardDate>
           </Link>
 
           <span>
