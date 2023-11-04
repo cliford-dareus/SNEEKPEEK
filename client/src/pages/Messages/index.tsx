@@ -12,6 +12,7 @@ import SideContent from "../../components/SideContent";
 import SearchModal from "../../components/UI/SearchModal";
 import { socketConnect } from "../../lib/socket/config";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Index = () => {
   const user = useAppSelector(selectCurrentUser) as IAuthInitialState;
@@ -63,19 +64,22 @@ const Index = () => {
           }}
         >
           {!isLoading && conversations?.conversation.length > 0 ? (
-            <div>
+            <MessageBoxContainer>
               {conversations?.conversation.map((con: any) => {
                 const friend = con?.users.filter(
                   (friend: any) => friend._id !== user.user?.userId
                 );
                 return (
-                  <Link to={`chat/${friend[0].username}/${con._id}`}>
+                  <MessageBox
+                    whileHover={{ y: 1 }}
+                    to={`chat/${friend[0].username}/${con._id}`}
+                  >
                     <p>{friend[0].username}</p>
                     <p>{con.lastmessage}</p>
-                  </Link>
+                  </MessageBox>
                 );
               })}
-            </div>
+            </MessageBoxContainer>
           ) : (
             <div>New Message</div>
           )}
@@ -163,4 +167,21 @@ const Input = styled.input`
   padding: 0.5em 1em;
   color: white;
   border-radius: 10px;
+`;
+
+const MessageBoxContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+`;
+
+const MessageBox = styled(motion(Link))`
+  background-color: var(--primary--color-400);
+  padding: 0.5em 1em;
+  border-radius: 10px;
+  color: var(--txt--color-100);
+
+  p:nth-of-type(1) {
+    font-weight: 600;
+  }
 `;

@@ -3,6 +3,7 @@ import { useAppSelector } from "../../app/hooks";
 import SideContent from "../../components/SideContent";
 import styled from "styled-components";
 import Button from "../../components/UI/Button";
+import BackButton from "../../components/UI/BackButton";
 import ProfileDetails from "./components/ProfileDetails";
 import { Link, Outlet, useParams } from "react-router-dom";
 import {
@@ -45,7 +46,10 @@ const Index = () => {
   return (
     <div style={{ flex: "1", display: "flex", gap: "1em" }}>
       <PageContainer>
-        <PageTitle>
+        <PageTitle
+          style={{ display: "flex", alignItems: "center", gap: "1em" }}
+        >
+          <BackButton />
           <h1>{currentUser?.user.username}</h1>
         </PageTitle>
 

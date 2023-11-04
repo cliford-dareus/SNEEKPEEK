@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { BsSearch, BsChat, BsBell, BsChevronDown } from "react-icons/bs";
 
-import SneekLogo from "../../assets/Sneekpeek.svg";
-import Profile from "../../assets/user.jpg";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { useSignOutUserMutation } from "../../features/api/auth";
-import { removeCredentials, selectCurrentUser } from "../../features/slice/authSlice";
+import SneekLogo from "../../../assets/Sneekpeek.svg";
+import Profile from "../../../assets/user.jpg";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { useSignOutUserMutation } from "../../../features/api/auth";
+import { removeCredentials, selectCurrentUser } from "../../../features/slice/authSlice";
 import { Header, HeaderActions, HeaderInput, HeaderInputContainer, HeaderProfileContainer, HeaderProfileModal, Icon, LogoContainer } from "./styles";
 
 const Index = () => {

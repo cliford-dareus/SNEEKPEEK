@@ -145,11 +145,11 @@ const signOut = async (req: Request, res: Response) => {
       { refreshToken: "", expirationTime: "" }
     );
 
-    res.clearCookie('refreshToken', {
+    res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: false,
       signed: true,
-    })
+    });
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
