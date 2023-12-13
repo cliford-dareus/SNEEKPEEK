@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 import { IAuthInitialState } from '../../utils/types/types'
 
-const URL = "http://localhost:4000";
+const URL = "https://sneekpeek.onrender.com/";
 const socket = io(URL, { autoConnect: false });
 
 const socketConnect = (user: IAuthInitialState ) => {
