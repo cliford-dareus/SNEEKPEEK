@@ -24,7 +24,7 @@ import notificationRouter from "./router/notification";
 
 import connectDB from "./db/connect";
 
-app.use(cors({ origin: "*", credentials: true }));
+app.use(cors({ origin: "https://sneekpeek.netlify.app", credentials: true }));
 app.use(express.json());
 app.use(morgan("combined"));
 app.use(CookieParser(process.env.JWT_SECRET));
