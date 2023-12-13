@@ -27,6 +27,7 @@ export const attachCookiesToResponse = ({
 
   res.cookie("refreshToken", refreshTokenJWT, {
     httpOnly: true,
+    sameSite: 'none',
     secure: false,
     signed: true,
     expires: new Date(Date.now() + ms("1d")),

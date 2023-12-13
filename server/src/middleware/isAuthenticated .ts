@@ -13,7 +13,6 @@ const isAuthenticated = async (
     const { refreshToken } = req.signedCookies;
     const authToken = req.get("Authorization");
     const accessToken = authToken?.split("Bearer ")[1];
-    console.log(accessToken)
     if (!accessToken || !refreshToken) {
       return res.status(StatusCodes.UNAUTHORIZED).json("UNAUTHORIZED");
     }
