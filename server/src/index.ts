@@ -37,6 +37,10 @@ app.use("/api/v1/conversation", conversationRouter);
 app.use("/api/v1/message", messageRouter);
 app.use("/api/v1/notification", notificationRouter);
 
+app.get('/', (req, res) => {
+  res.status(200).send("<h1>Welcome to sneekserver!</h1>");
+})
+
 const PORT = process.env.PORT || 4000;
 
 interface IUser {
