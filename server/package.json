@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc --outDir ./build ",
+    "build": "tsc --outDir ./build ",
     "start": "node build/index.js",
     "dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"ts-node --files src/index.ts\""
   },
