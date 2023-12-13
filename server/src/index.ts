@@ -11,7 +11,7 @@ dotenv.config();
 const app = express();
 const httpServer = createServer(app);
 const ioServer = new Server(httpServer, {
-  cors: { origin: "http://localhost:5173" },
+  cors: { origin: "https://sneekpeek.netlify.app" },
 });
 
 import authRouter from "./router/auth";
