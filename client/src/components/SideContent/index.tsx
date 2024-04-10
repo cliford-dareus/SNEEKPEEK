@@ -1,4 +1,3 @@
-
 import styled from "styled-components";
 import { LoginForm } from "../AuthForm";
 import { useAppSelector } from "../../app/hooks";
@@ -13,9 +12,6 @@ const Index = ({ children }: { children: React.ReactNode }) => {
       {isLogin ? (
         <div>
           <SideContentTop>{children}</SideContentTop>
-          {/* <div>
-            <h3>Friends</h3>
-          </div> */}
         </div>
       ) : (
         <LoginForm />
@@ -42,5 +38,3 @@ const SideContentTop = styled.div`
   padding: 1em;
   background-color: var(--dark--color-800);
 `;
-
-

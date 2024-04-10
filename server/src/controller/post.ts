@@ -8,28 +8,20 @@ import { ObjectId } from "mongoose";
 //Create Post
 const createPost = async (req: Request, res: Response) => {
   const { content, image } = req.body;
-  const id = req.user;
+  const id = req.user as ObjectId;
+
+  if (!content && !image) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: "You cant post blank content",
+    });
+  }
 
   try {
-    if (!content && !image) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusCodes.BAD_REQUEST,
-        message: "You cant post blank content",
-      });
-    }
-
-    const post = await Post.create({
-      author: id,
-      content,
-      image,
-    });
-
-    res.status(StatusCodes.CREATED).json({ post });
-  } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
-      status: StatusCodes.BAD_REQUEST,
-      message: ReasonPhrases.BAD_REQUEST,
-    });
+    await Post.create({ author: id, content, image });
+    res.status(StatusCodes.CREATED).end();
+  } catch {
+    res.status(StatusCodes.BAD_REQUEST).end();
   }
 };
 
@@ -160,14 +152,19 @@ const getAllPost = async (req: Request, res: Response) => {
 
 // Get User Post
 const getUserPost = async (req: Request, res: Response) => {
+  const { username } = req.params;
   try {
-    const { username } = req.params;
-    const user = await User.findOne({ username });
-
+    const user = await User.findOne({ username }).select("_id");
     if (!user) {
-      return;
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusCodes.NOT_FOUND,
+        message: "User not found",
+      });
     }
-    const post = await Post.find({ author: user._id });
+    const post = await Post.find({ author: user._id })
+      .select("-__v")
+      .populate("likes", ["_id", "username", "createdAt"])
+      .populate("author", ["username", "_id", "image"]);
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
@@ -196,30 +193,26 @@ const getTaggedInPosts = async (req: Request, res: Response) => {
 const getPostwithCommment = async (req: Request, res: Response) => {
   const { postId } = req.params;
   try {
-    const post = await Post.findOne({ _id: postId });
+    const post = await Post.findOne({ _id: postId }).populate({
+      path: "comments",
+      select: ["author", "content", "createdAt"],
+      populate: {
+        path: "author",
+        model: "User",
+        select: ["username", "image"],
+      },
+    });
+
     if (!post) {
-      return;
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        message: "No post with this id",
+      });
     }
 
-    const comment = await Promise.all(
-      post.comments.map(async (ct: ObjectId) => {
-        const comment = await Comment.findById(ct);
-
-        const user = await User.findById(comment?.author, {
-          username: true,
-          image: true,
-        });
-
-        return {
-          user,
-          comment,
-        };
-      })
-    );
-
     res.status(StatusCodes.OK).json({
-      message: "",
-      comment,
+      status: StatusCodes.OK,
+      post,
     });
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({

@@ -6,7 +6,7 @@ export const conversationApi = createApi({
   baseQuery,
   tagTypes: ["Conversation"],
   endpoints: (builder) => ({
-    getConversations: builder.query({
+    getConversations: builder.query<any, void>({
       query: () => ({
         url: "/conversation",
         method: "GET",

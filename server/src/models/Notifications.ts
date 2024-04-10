@@ -11,8 +11,12 @@ const NotificationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    type: { type: String },
-    status: { type: String, default: "RECEIVED" },
+    type: { type: String, enum: ["FOLLOW", "TAG", "LIKE", "COMMENT"] },
+    status: {
+      type: String,
+      enum: ["RECEIVED", "ACCEPTED"],
+      default: "RECEIVED",
+    },
   },
   { timestamps: true }
 );

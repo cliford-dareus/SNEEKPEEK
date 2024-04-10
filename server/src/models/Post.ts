@@ -14,6 +14,7 @@ const PostSchema = new mongoose.Schema(
     image: { type: String },
     likes: [{ type: mongoose.Types.ObjectId, ref: "User" }],
     comments: [{ type: mongoose.Types.ObjectId, ref: "Comment" }],
+    tags: [{ type: mongoose.Types.ObjectId, ref: "User" }],
     featured: {
       type: Boolean,
       default: false,

@@ -21,6 +21,7 @@ export const SideContntBtn = styled(NavLink)`
   font-size: 1rem;
   font-weight: 600;
   color: white;
+  position: relative;
 `;
 
 export const ActiveIndicator = styled(motion.div)`

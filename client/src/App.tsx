@@ -22,7 +22,6 @@ import { PrivateOutlet } from "./utils/Private/PrivateOutlet";
 
 function App() {
   useRefreshToken();
-  // const user = useAppSelector(selectCurrentUser);
 
   return (
     <>

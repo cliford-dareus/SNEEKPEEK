@@ -3,20 +3,10 @@ import {
   BsHouse,
   BsLightningCharge,
   BsPeople,
-  BsPersonAdd,
   BsThreeDots,
 } from "react-icons/bs";
-import UserProfile from "../../../assets/user.jpg";
 import { Flex } from "../../../lib/styled-component/styles";
-import { useAppSelector } from "../../../app/hooks";
-import { useGetNotificationsQuery } from "../../../features/api/notification";
-import { selectCurrentUser } from "../../../features/slice/authSlice";
-import { useEffect } from "react";
-import { LoaderContainer } from "../../../pages/Profile";
-import Loader from "../Loader";
-import { useAcceptRequestMutation } from "../../../features/api/user";
-import { socket } from "../../../lib/socket/config";
-import { toast } from "react-hot-toast";
+import ActivitiesComponent from "../../Activities";
 import {
   Icon,
   Navigation,
@@ -24,43 +14,16 @@ import {
   NavigationList,
   NavigationListItem,
   SideActivity,
-  SideContainer,
   SideContentActivity,
-  SideContentActivityBtn,
-  SideContentActivityCardText,
   SideContentContainer,
   SideContentSubTitle,
-  SideNewActivity,
-  SideNewActivityCard,
   SidebarContainer,
 } from "./styles";
+import { useAppSelector } from "../../../app/hooks";
+import { selectCurrentUser } from "../../../features/slice/authSlice";
 
 const Index = () => {
   const user = useAppSelector(selectCurrentUser);
-  const [acceptRequest] = useAcceptRequestMutation();
-  const { data, isLoading, refetch } = useGetNotificationsQuery(
-    {},
-    { skip: !user }
-  );
-
-  const handleAcceptRequest = async (id: string) => {
-    await acceptRequest(id);
-    refetch();
-  };
-
-  useEffect(() => {
-    socket.on("notification", ({ sender, target, message }) => {
-      if (target.userId === user.user?.userId) {
-        toast(sender.username + " " + message);
-        refetch();
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    refetch();
-  }, [user.token]);
-
   return (
     <SidebarContainer>
       <Navigation>
@@ -120,53 +83,8 @@ const Index = () => {
               </div>
             </div>
           </SideActivity>
-
-          <SideNewActivity>
-            <Flex>
-              <SideContentSubTitle>New</SideContentSubTitle>
-
-              <Icon>
-                <BsThreeDots />
-              </Icon>
-            </Flex>
-            {user.token && (
-              <SideContainer>
-                {!isLoading ? (
-                  data?.notifications.length !== 0 ? (
-                    data?.notifications.map((notification: any) => (
-                      <SideNewActivityCard
-                        key={notification?._id}
-                        $status={notification.status}
-                      >
-                        <img src={UserProfile} alt="" />
-                        <SideContentActivityCardText
-                          $status={notification.status}
-                        >
-                          <span>{notification?.sender.username}</span>
-                          <p>Follows you</p>
-                        </SideContentActivityCardText>
-                        <SideContentActivityBtn
-                          $status={notification.status}
-                          onClick={() =>
-                            handleAcceptRequest(notification.sender._id)
-                          }
-                        >
-                          <BsPersonAdd />
-                        </SideContentActivityBtn>
-                      </SideNewActivityCard>
-                    ))
-                  ) : (
-                    <h3>No new Notification</h3>
-                  )
-                ) : (
-                  <LoaderContainer>
-                    <Loader />
-                  </LoaderContainer>
-                )}
-              </SideContainer>
-            )}
-          </SideNewActivity>
         </SideContentActivity>
+        <ActivitiesComponent  user={user}/>
       </SideContentContainer>
     </SidebarContainer>
   );

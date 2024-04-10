@@ -175,6 +175,16 @@ const followUser = async (req: Request, res: Response) => {
       res,
     });
 
+    if (
+      userToFollow.followers.includes(id) ||
+      userToFollow.request.includes(id)
+    ) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        message: "Already followed",
+      });
+    }
+
     await userToFollow.updateOne({ $push: { request: id } });
 
     await Notification.create({
@@ -196,15 +206,14 @@ const followUser = async (req: Request, res: Response) => {
 };
 
 // UnFollow User
-
-// Accept Request
-const acceptRequest = async (req: Request, res: Response) => {
+const unFollowUser = async (req: Request, res: Response) => {
+  const { username } = req.params;
   const id = req.user;
-  const { userToAcceptId } = req.params;
 
   try {
-    const userToAccept = await User.findOne({ _id: userToAcceptId });
-    if (!userToAccept) {
+    const userToUnFollow = await User.findOne({ username });
+
+    if (!userToUnFollow) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
         message: "User doesn't exist",
@@ -212,44 +221,89 @@ const acceptRequest = async (req: Request, res: Response) => {
     }
 
     checkUserIdentity({
-      userTofollowId: userToAccept._id as unknown as string,
+      userTofollowId: userToUnFollow._id as unknown as string,
       currentUserId: id,
       res,
     });
 
-    const currentUser = await User.findOne({ _id: id });
-    if (!currentUser) {
+    if (!userToUnFollow.followers.includes(id)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        message: "Already unfollowed",
+      });
+    }
+
+    await userToUnFollow.updateOne({ $pull: { followers: id } });
+
+    return res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: "Unfollowed",
+    });
+  } catch (error) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
+};
+
+// Accept Request
+const acceptRequest = async (req: Request, res: Response) => {
+  const { userToAcceptId } = req.params;
+  const id = req.user;
+
+  try {
+    const [userToAccept, currentUser] = await Promise.all([
+      User.findById(userToAcceptId).select("+request"),
+      User.findById(id).select("+followers"),
+    ]);
+
+    if (!userToAccept || !currentUser) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
         message: "User doesn't exist",
       });
     }
 
+    
+    checkUserIdentity({
+      userTofollowId: userToAccept._id.toString(),
+      currentUserId: id,
+      res,
+    });
+    
     if (!currentUser.request.includes(userToAccept._id)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
         message: "User doesn't exist",
       });
     }
-
-    await currentUser.updateOne({
-      $push: { followers: userToAccept._id },
-      $pull: { request: userToAccept._id },
-      $inc: { followersLength: 1 },
-    });
-
-    await userToAccept.updateOne({
-      $push: { followings: currentUser._id },
-      $inc: { followingsLength: 1 },
-    });
-
-    await Notification.updateOne(
-      { sender: userToAccept._id, target: currentUser._id },
-      { status: "READ" }
+    
+    userToAccept.followers.push(id);
+    currentUser.request = currentUser.request.filter(
+      (request) => request === userToAccept._id
     );
-
-    console.log("USER ID 3" + userToAcceptId);
-
+    
+    if (currentUser.followers.includes(userToAccept._id)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        message: "Already followed",
+      })
+    }
+    currentUser.followers.push(userToAccept._id);
+    currentUser.followersLength++;
+    userToAccept.followingsLength++;
+    
+    await Promise.all([
+      userToAccept.save(),
+      currentUser.save(),
+      Notification.updateOne(
+        { sender: userToAccept._id, target: currentUser._id },
+        { status: "READ" }
+      ),
+    ]);
+    
+    console.log("GOT HERE");
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       message: "Request accepted",

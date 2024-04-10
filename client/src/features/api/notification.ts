@@ -6,22 +6,7 @@ export const notificationApi = createApi({
   baseQuery,
   tagTypes: ["Notification"],
   endpoints: (builder) => ({
-    // getPost: builder.query({
-    //   query: () => ({
-    //     url: "/post",
-    //     method: "GET",
-    //   }),
-    //   providesTags: (result) =>
-    //     result
-    //       ? [
-    //           ...result.post.map(({ _id }: { _id: string }) => ({
-    //             type: "Post" as const,
-    //             _id,
-    //           })),
-    //         ]
-    //       : ["Post"],
-    // }),
-    getNotifications: builder.query({
+    getNotifications: builder.query<any, void>({
       query: () => ({
         url: `/notification`,
       }),

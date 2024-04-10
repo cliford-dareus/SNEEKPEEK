@@ -1,32 +1,32 @@
-import { useEffect, useState } from "react";
 import { Container } from "../../../lib/styled-component/styles";
-import { socket } from "../../../lib/socket/config";
+import { useGetConversationsQuery } from "../../../features/api/conversations";
+import { useMemo } from "react";
 import { useAppSelector } from "../../../app/hooks";
-import { selectCurrentUser } from "../../../features/slice/authSlice";
 
 const Index = () => {
-  const user = useAppSelector(selectCurrentUser);
-  const [message, setMessage] = useState<string[]>([]);
-  // const { data: conversations, isLoading } = useGetConversationsQuery({});
+  const { data: conversations, isLoading } = useGetConversationsQuery();
+  const user = useAppSelector((state) => state.auth.user);
+  console.log(user)
 
-  // console.log(conversations)
+  const lastConversation = useMemo(() => {
+    if (!conversations) return null;
 
-  useEffect(() => {
-    socket.on("private_message", ({ sender, reciever, message }) => {
-      if (sender.username !== user && reciever.username === user.user?.username) {
-        setMessage((prev) => [...prev, sender.username]);
-        console.log("RECIEVED " + sender.username, message);
-      }
-    });
-  }, []);
+    return conversations?.conversation.slice()
+      .sort((a: any, b: any) => {
+        return (
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+      })
+      .slice(0, 5);
+  }, [conversations, isLoading]);
+
+  console.log(lastConversation)
 
   return (
     <Container>
-      <div>
-        {message.map((msg) => (
-          <p>{msg}</p>
-        ))}
-      </div>
+      {lastConversation?.map(({_id, lastmessage }: { _id: string, lastmessage: string }) => (
+        <p key={_id}>{lastmessage}</p>
+      ))}
     </Container>
   );
 };

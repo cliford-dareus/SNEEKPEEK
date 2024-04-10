@@ -14,7 +14,7 @@ const router = expres.Router();
 
 router.route("/").post(isAuthenticated, createPost).get(getAllPost);
 router.route("/edit").patch(isAuthenticated, editPost);
-router.route('/personal/:username').get(getUserPost)
+router.route("/personal/:username").get(getUserPost);
 router
   .route("/:postId")
   .delete(isAuthenticated, deletePost)

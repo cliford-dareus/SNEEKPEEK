@@ -1,7 +1,10 @@
+import { useGetPostQuery } from "../../../features/api/post"
 
 const Index = () => {
+ 
+
   return (
-    <div>index</div>
+    <div></div>
   )
 }
 

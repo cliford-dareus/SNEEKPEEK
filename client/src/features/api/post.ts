@@ -7,7 +7,7 @@ export const postApi = createApi({
   baseQuery,
   tagTypes: ["Post"],
   endpoints: (builder) => ({
-    getPost: builder.query({
+    getPost: builder.query<any, void>({
       query: () => ({
         url: "/post",
         method: "GET",
@@ -41,6 +41,7 @@ export const postApi = createApi({
         method: "PATCH",
         body: rest,
       }),
+      invalidatesTags: (arg) => [{ type: "Post", id: arg.id }],
     }),
     likeOrUnlikePost: builder.mutation({
       query: (postId) => ({
