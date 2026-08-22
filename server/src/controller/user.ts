@@ -4,7 +4,6 @@ import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { checkUserIdentity } from "../utils/checkUserIdentity";
 import Notification from "../models/Notifications";
 
-// Get User by id
 const getUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -12,7 +11,7 @@ const getUser = async (req: Request, res: Response) => {
     if (!user) {
       throw new Error("user does not exist");
     }
-    const { password, __v, ...otherInfo } = user;
+    const { password, __v, ...otherInfo } = user.toObject();
     res.status(200).send({
       status: "success",
       message: "user info",
@@ -26,34 +25,32 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 
-// Get User by username
 const getUserByName = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
-    console.log(username);
 
     if (!username) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
-        message: "Please Enter an Username!",
+        message: "Please enter a username",
       });
     }
 
-    const user = await User.findOne({ username })
+    const user = await User.findOne({ username: username.toLowerCase() })
       .populate("request", ["_id", "username", "image"])
       .populate("followers", ["_id", "username", "image"])
       .populate("followings", ["_id", "username", "image"]);
 
     if (!user) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusCodes.BAD_REQUEST,
-        message: "User doesn't exit!",
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusCodes.NOT_FOUND,
+        message: "User doesn't exist",
       });
     }
 
     const { password, __v, email, ...other } = user.toObject();
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       user: other,
     });
@@ -65,13 +62,10 @@ const getUserByName = async (req: Request, res: Response) => {
   }
 };
 
-// Search User
 const searchUser = async (req: Request, res: Response) => {
   try {
     const { username, sort, limit = 10 } = req.query;
     let searchTerm: { [key: string]: any } = {};
-
-    console.log(username);
 
     if (username) {
       searchTerm.username = { $regex: username as string, $options: "i" };
@@ -88,13 +82,9 @@ const searchUser = async (req: Request, res: Response) => {
     const users = await User.find(searchTerm)
       .limit(Number(limit))
       .sort(sortTerm)
-      .select("id username image");
+      .select("_id username image");
 
-    if (!users) {
-      return;
-    }
-
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       users,
     });
@@ -106,7 +96,6 @@ const searchUser = async (req: Request, res: Response) => {
   }
 };
 
-// Edit User
 const editUser = async (req: Request, res: Response) => {
   try {
     const userId = req.user;
@@ -114,7 +103,7 @@ const editUser = async (req: Request, res: Response) => {
     if (!newUsername && !newImage) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
-        message: "You must provide something new to update!",
+        message: "You must provide something new to update",
       });
     }
 
@@ -123,29 +112,24 @@ const editUser = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
-        message: "User account not found!",
+        message: "User account not found",
       });
     }
 
     if (newUsername) {
-      user.username = newUsername;
-      user.save();
-
-      res.status(200).json({
-        status: StatusCodes.OK,
-        message: `User Profile updated`,
-      });
+      user.username = newUsername.toLowerCase();
     }
 
     if (newImage) {
       user.image = newImage;
-      user.save();
-
-      res.status(200).json({
-        status: StatusCodes.OK,
-        message: `User Profile updated`,
-      });
     }
+
+    await user.save();
+
+    return res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: "User profile updated",
+    });
   } catch (error) {
     return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
@@ -154,13 +138,12 @@ const editUser = async (req: Request, res: Response) => {
   }
 };
 
-// Follow User
 const followUser = async (req: Request, res: Response) => {
   const { username } = req.params;
   const id = req.user;
 
   try {
-    const userToFollow = await User.findOne({ username });
+    const userToFollow = await User.findOne({ username: username.toLowerCase() });
 
     if (!userToFollow) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -169,11 +152,28 @@ const followUser = async (req: Request, res: Response) => {
       });
     }
 
-    checkUserIdentity({
-      userTofollowId: userToFollow._id as unknown as string,
-      currentUserId: id,
-      res,
-    });
+    if (String(userToFollow._id) === String(id)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        message: "You can't follow yourself",
+      });
+    }
+
+    const alreadyRequested = userToFollow.request.some(
+      (r) => String(r) === String(id)
+    );
+    const alreadyFollowing = userToFollow.followers.some(
+      (f) => String(f) === String(id)
+    );
+
+    if (alreadyRequested || alreadyFollowing) {
+      return res.status(StatusCodes.CONFLICT).json({
+        status: StatusCodes.CONFLICT,
+        message: alreadyFollowing
+          ? "Already following this user"
+          : "Follow request already sent",
+      });
+    }
 
     await userToFollow.updateOne({ $push: { request: id } });
 
@@ -181,11 +181,17 @@ const followUser = async (req: Request, res: Response) => {
       sender: id,
       target: userToFollow._id,
       type: "REQUEST",
+      message: "sent you a follow request",
+      status: "RECEIVED",
     });
 
     return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       message: "Request sent",
+      target: {
+        userId: userToFollow._id,
+        username: userToFollow.username,
+      },
     });
   } catch (error) {
     return res.status(StatusCodes.BAD_REQUEST).json({
@@ -195,9 +201,6 @@ const followUser = async (req: Request, res: Response) => {
   }
 };
 
-// UnFollow User
-
-// Accept Request
 const acceptRequest = async (req: Request, res: Response) => {
   const id = req.user;
   const { userToAcceptId } = req.params;
@@ -211,11 +214,12 @@ const acceptRequest = async (req: Request, res: Response) => {
       });
     }
 
-    checkUserIdentity({
-      userTofollowId: userToAccept._id as unknown as string,
-      currentUserId: id,
-      res,
-    });
+    if (String(userToAccept._id) === String(id)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        message: "Invalid request",
+      });
+    }
 
     const currentUser = await User.findOne({ _id: id });
     if (!currentUser) {
@@ -225,10 +229,14 @@ const acceptRequest = async (req: Request, res: Response) => {
       });
     }
 
-    if (!currentUser.request.includes(userToAccept._id)) {
+    const hasRequest = currentUser.request.some(
+      (r) => String(r) === String(userToAccept._id)
+    );
+
+    if (!hasRequest) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
-        message: "User doesn't exist",
+        message: "No pending request from this user",
       });
     }
 
@@ -243,14 +251,24 @@ const acceptRequest = async (req: Request, res: Response) => {
       $inc: { followingsLength: 1 },
     });
 
-    await Notification.updateOne(
-      { sender: userToAccept._id, target: currentUser._id },
+    await Notification.updateMany(
+      {
+        sender: userToAccept._id,
+        target: currentUser._id,
+        type: "REQUEST",
+      },
       { status: "READ" }
     );
 
-    console.log("USER ID 3" + userToAcceptId);
+    await Notification.create({
+      sender: currentUser._id,
+      target: userToAccept._id,
+      type: "FOLLOW",
+      message: "accepted your follow request",
+      status: "RECEIVED",
+    });
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       message: "Request accepted",
     });
@@ -262,7 +280,6 @@ const acceptRequest = async (req: Request, res: Response) => {
   }
 };
 
-// Decline Request
 const declineRequest = async (req: Request, res: Response) => {
   const id = req.user;
   const { userToAcceptId } = req.params;
@@ -276,12 +293,6 @@ const declineRequest = async (req: Request, res: Response) => {
       });
     }
 
-    checkUserIdentity({
-      userTofollowId: userToAccept._id as unknown as string,
-      currentUserId: id,
-      res,
-    });
-
     const currentUser = await User.findOne({ _id: id });
     if (!currentUser) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -290,12 +301,34 @@ const declineRequest = async (req: Request, res: Response) => {
       });
     }
 
-    if (!currentUser.request.includes(userToAccept._id)) {
+    const hasRequest = currentUser.request.some(
+      (r) => String(r) === String(userToAccept._id)
+    );
+
+    if (!hasRequest) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
-        message: "User doesn't exist",
+        message: "No pending request from this user",
       });
     }
+
+    await currentUser.updateOne({
+      $pull: { request: userToAccept._id },
+    });
+
+    await Notification.updateMany(
+      {
+        sender: userToAccept._id,
+        target: currentUser._id,
+        type: "REQUEST",
+      },
+      { status: "READ" }
+    );
+
+    return res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: "Request declined",
+    });
   } catch (error) {
     return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
