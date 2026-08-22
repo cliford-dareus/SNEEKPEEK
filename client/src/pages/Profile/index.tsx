@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Button from "../../components/UI/Button";
 import BackButton from "../../components/UI/BackButton";
 import ProfileDetails from "./components/ProfileDetails";
-import { Link, Outlet, useParams } from "react-router-dom";
+import { Link, NavLink, Outlet, useParams } from "react-router-dom";
 import {
   useFollowUserMutation,
   useGetUserByUsernameQuery,
@@ -13,6 +13,7 @@ import {
 import { socket } from "../../lib/socket/config";
 import { selectCurrentUser } from "../../features/slice/authSlice";
 import { IFullUserResponse } from "../../utils/types/types";
+import Trending from "../../components/SideContent/trending";
 
 const Index = () => {
   const { name } = useParams();
@@ -44,23 +45,21 @@ const Index = () => {
   };
 
   return (
-    <div style={{ flex: "1", display: "flex", gap: "1em" }}>
+    <ProfileLayout>
       <PageContainer>
         <PageTitle
           style={{ display: "flex", alignItems: "center", gap: "1em" }}
         >
           <BackButton />
-          <h1>{currentUser?.user.username}</h1>
+          <h1>{currentUser?.user.username ?? name}</h1>
         </PageTitle>
 
         <ProfileHeader>
-          <ProfileBanner>
-            <img src="" alt="" />
-          </ProfileBanner>
+          <ProfileBanner />
 
           {name !== user?.user?.username ? (
             <ProfileBtn onClick={onFollowUser}>
-              <Button label="Follow" isLoading={false} color={false} />
+              <Button label="Follow" isLoading={false} color={true} />
             </ProfileBtn>
           ) : (
             <ProfileBtn>
@@ -70,92 +69,130 @@ const Index = () => {
 
           <ProfileDetails currentUser={currentUser as IFullUserResponse} />
 
-          <ProfilePic></ProfilePic>
+          <ProfilePic aria-hidden />
         </ProfileHeader>
 
         <ProfileContent>
           <ProfileActions>
             <li>
-              <Link to=".">Post</Link>
+              <TabLink to="." end>
+                Posts
+              </TabLink>
             </li>
             <li>
-              <Link to="likes">Likes</Link>{" "}
+              <TabLink to="likes">Likes</TabLink>
             </li>
             <li>
-              <Link to="tags">Tags</Link>{" "}
+              <TabLink to="tags">Tags</TabLink>
             </li>
             {name === user.user?.username && (
               <li>
-                <Link to="requests">Requests</Link>
+                <TabLink to="requests">Requests</TabLink>
               </li>
             )}
           </ProfileActions>
 
-          <div>
-            <div>
-              <Outlet context={{ user: currentUser?.user }} />
-            </div>
-          </div>
+          <Outlet context={{ user: currentUser?.user }} />
         </ProfileContent>
       </PageContainer>
 
       <SideContent>
-        <div style={{ height: "40px", marginBottom: "1em" }}>
-          <h3>Trending</h3>
-        </div>
+        <SideHeading>Trending</SideHeading>
+        <Trending />
       </SideContent>
-    </div>
+    </ProfileLayout>
   );
 };
 
 export default Index;
 
+const ProfileLayout = styled.div`
+  flex: 1;
+  display: flex;
+  gap: var(--content-gap);
+  min-width: 0;
+`;
+
 const ProfileHeader = styled.div`
   position: relative;
-  margin-top: 1em;
+  margin-top: 0.5em;
+  margin-bottom: 4.5em;
 `;
 
 const ProfileBanner = styled.div`
   width: 100%;
-  height: 200px;
-  background-color: purple;
-  border-radius: 10px;
+  height: 160px;
+  background: linear-gradient(
+    135deg,
+    var(--primary--color-500),
+    var(--primary-color--900)
+  );
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
 `;
 
 const ProfilePic = styled.div`
   position: absolute;
-  top: 200px;
+  top: 160px;
   left: 1em;
   transform: translateY(-50%);
-  width: 120px;
+  width: 96px;
   aspect-ratio: 1;
   border-radius: 50%;
-  background-color: #c74bc7;
+  background: var(--dark--color-700);
+  border: 3px solid var(--dark--color-900);
+  box-shadow: var(--shadow-sm);
 `;
 
 const ProfileBtn = styled.div`
   position: absolute;
-  right: 2em;
-  top: 40%;
-  top: 200px;
+  right: 1em;
+  top: 160px;
   transform: translateY(-50%);
   display: flex;
-  justify-content: space-between;
   align-items: center;
 `;
 
 const ProfileActions = styled.ul`
   display: flex;
-  padding: 1em 4em;
-  align-content: center;
+  padding: 0 0.5em;
+  align-items: center;
   background-color: var(--dark--color-800);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   justify-content: space-around;
+  margin-bottom: 0.75em;
+`;
+
+const TabLink = styled(NavLink)`
+  display: block;
+  padding: 0.9em 0.75em;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--txt--muted);
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    color: var(--txt--color-100);
+  }
+
+  &.active {
+    color: var(--primary--color-400);
+    border-bottom-color: var(--primary--color-400);
+  }
 `;
 
 const ProfileContent = styled.div`
   margin-top: 1em;
   display: flex;
   flex-direction: column;
+`;
+
+const SideHeading = styled.h3`
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.85em;
 `;
 
 export const LoaderContainer = styled.div`
