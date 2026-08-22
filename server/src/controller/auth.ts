@@ -10,7 +10,6 @@ import {
   createAccessToken,
   jwtVerify,
 } from "../utils/jwt";
-// import { UserToken } from "../types/user.type";
 import crypto from "crypto";
 import { UserToken } from "../types/typing";
 
@@ -19,57 +18,66 @@ const signUp = async (req: Request, res: Response) => {
   try {
     const { name, username, email, password } = req.body;
 
-    if (!name || !username || !email) {
-      return res.status(StatusCodes.BAD_REQUEST).send({
+    if (!name || !username || !email || !password) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
         message: ReasonPhrases.BAD_REQUEST,
       });
     }
 
-    const isUserExist = await User.find({ email });
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }],
+    });
 
-    if (!isUserExist) {
-      return res.status(StatusCodes.CONFLICT).send({
+    if (existingUser) {
+      return res.status(StatusCodes.CONFLICT).json({
         status: StatusCodes.CONFLICT,
         message: ReasonPhrases.CONFLICT,
       });
     }
 
-    const user = await User.create({
+    await User.create({
       name,
       username,
       email,
       password,
     });
 
-    res.status(StatusCodes.CREATED).json({
+    return res.status(StatusCodes.CREATED).json({
       status: StatusCodes.CREATED,
       message: ReasonPhrases.CREATED,
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).send({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
   }
 };
 
-//Sign In
+// Sign In
 const signIn = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
 
-    const user = await User.findOne({ username });
-    const isPasswordCorrect = await user?.comparePassword(password);
-
-    if (!isPasswordCorrect || !user) {
-      return res.status(StatusCodes.BAD_REQUEST).send({
+    if (!username || !password) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
         message: ReasonPhrases.BAD_REQUEST,
       });
     }
 
-    const UserToken = createTokenUser(user) as UserToken;
+    const user = await User.findOne({ username });
+    const isPasswordCorrect = await user?.comparePassword(password);
+
+    if (!isPasswordCorrect || !user) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        message: ReasonPhrases.BAD_REQUEST,
+      });
+    }
+
+    const UserTokenPayload = createTokenUser(user) as UserToken;
 
     let refreshToken = "";
     const isTokenExist = await Token.findOne({ userId: user._id });
@@ -78,23 +86,27 @@ const signIn = async (req: Request, res: Response) => {
       const { isValid } = isTokenExist;
 
       if (!isValid) {
-        res.status(StatusCodes.BAD_REQUEST).send({
+        return res.status(StatusCodes.BAD_REQUEST).json({
           status: StatusCodes.BAD_REQUEST,
+          message: ReasonPhrases.BAD_REQUEST,
         });
       }
 
-      refreshToken = isTokenExist?.refreshToken;
-      attachCookiesToResponse({ res, user: UserToken, refreshToken });
-      const accessToken = createAccessToken(UserToken);
-      res.status(StatusCodes.OK).json({
+      refreshToken = isTokenExist.refreshToken;
+      attachCookiesToResponse({
+        res,
+        user: UserTokenPayload,
+        refreshToken,
+      });
+      const accessToken = createAccessToken(UserTokenPayload);
+      return res.status(StatusCodes.OK).json({
         status: StatusCodes.OK,
         user: {
-          ...UserToken,
+          ...UserTokenPayload,
           accessToken,
           expiresAt: new Date(Date.now() + ms("15m")),
         },
       });
-      return;
     }
 
     refreshToken = crypto.randomBytes(40).toString("hex");
@@ -106,35 +118,38 @@ const signIn = async (req: Request, res: Response) => {
     };
 
     await Token.create(tokenUser);
-    attachCookiesToResponse({ res, user: UserToken, refreshToken });
-    const accessToken = createAccessToken(UserToken);
+    attachCookiesToResponse({
+      res,
+      user: UserTokenPayload,
+      refreshToken,
+    });
+    const accessToken = createAccessToken(UserTokenPayload);
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       user: {
-        ...UserToken,
+        ...UserTokenPayload,
         accessToken,
         expiresAt: new Date(Date.now() + ms("15m")),
       },
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).send({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
   }
 };
 
-//Sign Out
+// Sign Out
 const signOut = async (req: Request, res: Response) => {
   try {
     const userId = req.user;
 
     const user = await User.findById(userId);
-    console.log(user);
 
     if (!user) {
-      return res.status(StatusCodes.BAD_REQUEST).send({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
         message: ReasonPhrases.BAD_REQUEST,
       });
@@ -151,24 +166,24 @@ const signOut = async (req: Request, res: Response) => {
       signed: true,
     });
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       message: "User logged out",
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).send({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
   }
 };
 
-//RefreshToken
+// Refresh Token
 const refreshTokenFn = async (req: Request, res: Response) => {
   const { refreshToken } = req.signedCookies;
 
   if (!refreshToken) {
-    return res.status(StatusCodes.NO_CONTENT);
+    return res.status(StatusCodes.NO_CONTENT).send();
   }
 
   try {
@@ -178,7 +193,6 @@ const refreshTokenFn = async (req: Request, res: Response) => {
     });
 
     if (!isTokenExist) {
-      const isExist = false;
       await clearRefreshToken(req, res, false);
       return res.status(StatusCodes.UNAUTHORIZED).json({
         status: StatusCodes.UNAUTHORIZED,
@@ -186,38 +200,41 @@ const refreshTokenFn = async (req: Request, res: Response) => {
       });
     }
 
-    try {
-      const user = await User.findOne({
-        _id: decodedRefreshToken?.user?.userId,
+    const user = await User.findOne({
+      _id: decodedRefreshToken?.user?.userId,
+    });
+
+    if (!user) {
+      await clearRefreshToken(req, res, true);
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        message: ReasonPhrases.UNAUTHORIZED,
       });
-
-      if (!user) {
-        await clearRefreshToken(req, res, true);
-        return res.status(StatusCodes.UNAUTHORIZED);
-      }
-
-      const UserToken = { username: user.username, userId: user._id };
-      const accessToken = createAccessToken(UserToken);
-
-      res.status(StatusCodes.OK).json({
-        status: StatusCodes.OK,
-        user: {
-          ...UserToken,
-          accessToken,
-          expiresAt: new Date(Date.now() + ms("15m")),
-        },
-      });
-    } catch (error) {
-      res.status(StatusCodes.BAD_REQUEST);
     }
+
+    const UserTokenPayload = {
+      username: user.username,
+      userId: user._id,
+    };
+    const accessToken = createAccessToken(UserTokenPayload);
+
+    return res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      user: {
+        ...UserTokenPayload,
+        accessToken,
+        expiresAt: new Date(Date.now() + ms("15m")),
+      },
+    });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).send({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
   }
 };
 
+// Reset Password
 const resetPassword = async (req: Request, res: Response) => {
   const userId = req.user;
   const { oldpassword, newpassword } = req.body;
@@ -238,8 +255,24 @@ const resetPassword = async (req: Request, res: Response) => {
         message: "Invalid credentials",
       });
     }
+
+    const isMatch = await user.comparePassword(oldpassword);
+    if (!isMatch) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        message: "Incorrect current password",
+      });
+    }
+
+    user.password = newpassword;
+    await user.save();
+
+    return res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: "Password updated successfully",
+    });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).send({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
