@@ -11,10 +11,9 @@ const Index = ({
   color?: boolean;
 }) => {
   return (
-    //Add styling for btn disabled
-    <Button disabled={isLoading} $bg={color} >
+    <Button disabled={isLoading} $bg={color}>
       {!isLoading ? (
-        <p>{label}</p>
+        <span>{label}</span>
       ) : (
         <div style={{ width: "59px", height: "18.5px" }}>
           <Loader />
@@ -31,17 +30,38 @@ interface BgProp {
 }
 
 const Button = styled.button<BgProp>`
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   outline: none;
-  border: none;
-  border-radius: 30px;
-  padding: 0.5em 1em;
-  font-size: 1rem;
-  font-weight: bold;
+  border: 1px solid
+    ${(props) =>
+      props.$bg === true ? "transparent" : "var(--border-strong)"};
+  border-radius: var(--radius-full);
+  padding: 0.55em 1.25em;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    opacity 0.15s ease, transform 0.1s ease;
   background-color: ${(props) =>
-    props.$bg === true ? "var(--primary--color-400)" : ""};
-  color: ${(props) => (props.$bg === true ? "white" : "")};
+    props.$bg === true ? "var(--primary--color-400)" : "var(--dark--color-750)"};
+  color: ${(props) =>
+    props.$bg === true ? "#fff" : "var(--txt--color-100)"};
+
+  &:hover:not(:disabled) {
+    background-color: ${(props) =>
+      props.$bg === true
+        ? "var(--primary--color-500)"
+        : "var(--dark--color-700)"};
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
 `;
