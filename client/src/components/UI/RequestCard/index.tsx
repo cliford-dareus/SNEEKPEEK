@@ -2,34 +2,46 @@ import { FC } from "react";
 import { IRequestData } from "../../../utils/types/types";
 import styled from "styled-components";
 import { RiUserFollowLine, RiUserUnfollowLine } from "react-icons/ri";
-import { useAcceptRequestMutation } from "../../../features/api/user";
+import {
+  useAcceptRequestMutation,
+  useDeclineRequestMutation,
+} from "../../../features/api/user";
 import { useAppSelector } from "../../../app/hooks";
 import { selectCurrentUser } from "../../../features/slice/authSlice";
 import { socket } from "../../../lib/socket/config";
+import toast from "react-hot-toast";
 
 const Index: FC<{ req: IRequestData }> = ({ req }) => {
-  const [accept] = useAcceptRequestMutation();
+  const [accept, { isLoading: accepting }] = useAcceptRequestMutation();
+  const [decline, { isLoading: declining }] = useDeclineRequestMutation();
   const user = useAppSelector(selectCurrentUser);
 
-  const handleAcccept = async (id: string) => {
+  const handleAccept = async (id: string) => {
     try {
-      await accept(id);
+      await accept(id).unwrap();
 
       socket.emit("notification", {
         message: "accepted your follow request",
+        type: "FOLLOW",
         target: { userId: req._id, username: req.username },
-        sender: { userId: user?.user?.userId, username: user?.user?.username },
+        sender: {
+          userId: user?.user?.userId,
+          username: user?.user?.username,
+        },
       });
-    } catch (error) {
-      console.log(error);
+
+      toast.success(`Accepted @${req.username}`);
+    } catch {
+      toast.error("Could not accept request");
     }
   };
 
   const handleReject = async (id: string) => {
     try {
-      console.log(id);
-    } catch (error) {
-      console.log(error);
+      await decline(id).unwrap();
+      toast.success(`Declined @${req.username}`);
+    } catch {
+      toast.error("Could not decline request");
     }
   };
 
@@ -42,7 +54,8 @@ const Index: FC<{ req: IRequestData }> = ({ req }) => {
         <ActionBtn
           type="button"
           $variant="accept"
-          onClick={() => handleAcccept(req._id)}
+          disabled={accepting || declining}
+          onClick={() => handleAccept(req._id)}
           aria-label={`Accept ${req.username}`}
         >
           <RiUserFollowLine />
@@ -50,6 +63,7 @@ const Index: FC<{ req: IRequestData }> = ({ req }) => {
         <ActionBtn
           type="button"
           $variant="reject"
+          disabled={accepting || declining}
           onClick={() => handleReject(req._id)}
           aria-label={`Decline ${req.username}`}
         >
@@ -109,11 +123,16 @@ const ActionBtn = styled.button<{ $variant: "accept" | "reject" }>`
     p.$variant === "accept" ? "var(--success)" : "var(--danger)"};
   transition: opacity 0.15s ease, transform 0.1s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     opacity: 0.9;
   }
 
-  &:active {
+  &:active:not(:disabled) {
     transform: scale(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
