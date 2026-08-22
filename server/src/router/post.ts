@@ -1,5 +1,5 @@
 import expres from "express";
-import isAuthenticated from "../middleware/isAuthenticated ";
+import isAuthenticated from "../middleware/isAuthenticated";
 import {
   createPost,
   deletePost,
@@ -14,7 +14,7 @@ const router = expres.Router();
 
 router.route("/").post(isAuthenticated, createPost).get(getAllPost);
 router.route("/edit").patch(isAuthenticated, editPost);
-router.route('/personal/:username').get(getUserPost)
+router.route("/personal/:username").get(getUserPost);
 router
   .route("/:postId")
   .delete(isAuthenticated, deletePost)
