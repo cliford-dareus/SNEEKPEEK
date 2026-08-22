@@ -8,27 +8,42 @@ import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
 import { useEffect } from "react";
 import { socket } from "../../lib/socket/config";
 import { toast } from "react-hot-toast";
-// import { motion } from "framer-motion";
+import styled from "styled-components";
 
 const Index = () => {
   const auth = useAuth();
   const { data, isLoading, isError } = useGetPostQuery("");
 
   const sortedData = () => {
-    const dataCopy = data?.post.slice();
+    const dataCopy = data?.post?.slice();
     return dataCopy?.sort(
-      (a: any, b: any) =>
+      (a: IPost, b: IPost) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   };
 
   useEffect(() => {
-    socket.on("notification", ({ sender, target, message }) => {
+    const handler = ({
+      sender,
+      target,
+      message,
+    }: {
+      sender: { username: string };
+      target: { userId: string };
+      message: string;
+    }) => {
       if (target.userId === auth.user?.userId) {
         toast(sender.username + " " + message);
       }
-    });
-  }, []);
+    };
+
+    socket.on("notification", handler);
+    return () => {
+      socket.off("notification", handler);
+    };
+  }, [auth.user?.userId]);
+
+  const posts = sortedData();
 
   return (
     <PageContainer>
@@ -38,30 +53,25 @@ const Index = () => {
 
       <div>{auth.token && <Featured />}</div>
 
-      {isError ? <h2>Error Baby</h2> : null}
+      {isError ? <Empty>Could not load posts. Try again later.</Empty> : null}
 
       <div>
         {!isLoading ? (
-          <div>
-            {sortedData()?.map((post: IPost) => (
-              <Card post={post} />
-            ))}
-          </div>
+          posts && posts.length > 0 ? (
+            <div>
+              {posts.map((post: IPost) => (
+                <Card key={post._id} post={post} />
+              ))}
+            </div>
+          ) : (
+            !isError && <Empty>No posts yet. Share something!</Empty>
+          )
         ) : (
-          <div
-            style={{
-              width: "100%",
-              height: "90%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "absolute",
-            }}
-          >
+          <LoaderWrap>
             <div style={{ width: "150px", height: "150px" }}>
               <Loader />
             </div>
-          </div>
+          </LoaderWrap>
         )}
       </div>
     </PageContainer>
@@ -69,3 +79,18 @@ const Index = () => {
 };
 
 export default Index;
+
+const LoaderWrap = styled.div`
+  width: 100%;
+  height: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+`;
+
+const Empty = styled.p`
+  text-align: center;
+  padding: 2em 1em;
+  opacity: 0.7;
+`;
