@@ -5,28 +5,50 @@ import { User } from "../models/User";
 import Comment from "../models/Comment";
 import { ObjectId } from "mongoose";
 
-//Create Post
+const postPopulate = [
+  { path: "likes", select: "_id username createdAt image" },
+  { path: "author", select: "username _id image" },
+  { path: "comments", select: "_id author content" },
+  { path: "tags", select: "_id username image" },
+];
+
+const resolveTagIds = async (tagUsernames: string[] = []) => {
+  if (!Array.isArray(tagUsernames) || tagUsernames.length === 0) return [];
+  const users = await User.find({
+    username: {
+      $in: tagUsernames.map((u) => String(u).toLowerCase().trim()),
+    },
+  }).select("_id");
+  return users.map((u) => u._id);
+};
+
+// Create Post
 const createPost = async (req: Request, res: Response) => {
-  const { content, image } = req.body;
+  const { content, image, tags } = req.body;
   const id = req.user;
 
   try {
     if (!content && !image) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
-        message: "You cant post blank content",
+        message: "You can't post blank content",
       });
     }
+
+    const tagIds = await resolveTagIds(tags);
 
     const post = await Post.create({
       author: id,
       content,
       image,
+      tags: tagIds,
     });
 
-    res.status(StatusCodes.CREATED).json({ post });
+    const populated = await Post.findById(post._id).populate(postPopulate);
+
+    return res.status(StatusCodes.CREATED).json({ post: populated });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
@@ -35,14 +57,21 @@ const createPost = async (req: Request, res: Response) => {
 
 // Edit Post
 const editPost = async (req: Request, res: Response) => {
-  const { postId, content, image } = req.body;
+  const { postId, content, image, tags } = req.body;
   const id = req.user;
 
   try {
-    if (!content && !image) {
+    if (!postId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
-        message: "You cant post blank content",
+        message: "postId is required",
+      });
+    }
+
+    if (content === undefined && image === undefined && tags === undefined) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        message: "Nothing to update",
       });
     }
 
@@ -55,20 +84,19 @@ const editPost = async (req: Request, res: Response) => {
       });
     }
 
-    if (content) {
-      post.content = content;
-      await post.save();
-      res.status(StatusCodes.OK).json({ post });
+    if (content !== undefined) post.content = content;
+    if (image !== undefined) post.image = image;
+    if (tags !== undefined) {
+      post.tags = (await resolveTagIds(tags)) as any;
     }
 
-    if (image) {
-      post.image = image;
-      await post.save();
+    await post.save();
 
-      res.status(StatusCodes.OK).json({ post });
-    }
+    const populated = await Post.findById(post._id).populate(postPopulate);
+
+    return res.status(StatusCodes.OK).json({ post: populated });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
@@ -90,12 +118,17 @@ const deletePost = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(StatusCodes.OK).json({
+    // Clean up comments for this post
+    if (post.comments?.length) {
+      await Comment.deleteMany({ _id: { $in: post.comments } });
+    }
+
+    return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
-      message: "Post Deleted",
+      message: "Post deleted",
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
@@ -111,27 +144,31 @@ const likeOrUnlikePost = async (req: Request, res: Response) => {
     const post = await Post.findById(postId);
 
     if (!post) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "No post wid this id" });
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusCodes.NOT_FOUND,
+        message: "Post not found",
+      });
     }
 
-    if (post.likes.includes(id)) {
-      await post.updateOne({ $pull: { likes: id } });
+    const alreadyLiked = post.likes.some(
+      (likeId) => String(likeId) === String(id)
+    );
 
-      res.status(StatusCodes.OK).json({
+    if (alreadyLiked) {
+      await post.updateOne({ $pull: { likes: id } });
+      return res.status(StatusCodes.OK).json({
         status: StatusCodes.OK,
         message: "Post unliked",
       });
-    } else {
-      await post.updateOne({ $push: { likes: id } });
-      res.status(StatusCodes.OK).json({
-        status: StatusCodes.OK,
-        message: "Post liked",
-      });
     }
+
+    await post.updateOne({ $push: { likes: id } });
+    return res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: "Post liked",
+    });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
@@ -142,16 +179,13 @@ const likeOrUnlikePost = async (req: Request, res: Response) => {
 const getAllPost = async (req: Request, res: Response) => {
   try {
     const post = await Post.find()
-      .populate("likes", ["_id", "username", "createdAt"])
-      .populate("author", ["username", "_id", "image"])
-      .populate("comments", ["_id", "author", "content"])
+      .populate(postPopulate)
+      .sort({ createdAt: -1 })
       .exec();
 
-    res.status(StatusCodes.OK).json({
-      post,
-    });
+    return res.status(StatusCodes.OK).json({ post });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
@@ -162,67 +196,116 @@ const getAllPost = async (req: Request, res: Response) => {
 const getUserPost = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username: username.toLowerCase() });
 
     if (!user) {
-      return;
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusCodes.NOT_FOUND,
+        message: "User not found",
+      });
     }
-    const post = await Post.find({ author: user._id });
 
-    res.status(StatusCodes.OK).json({
+    const post = await Post.find({ author: user._id })
+      .populate(postPopulate)
+      .sort({ createdAt: -1 });
+
+    return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       post,
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
   }
 };
 
-// Get Tagged In Posts
+// Get posts where user is tagged
 const getTaggedInPosts = async (req: Request, res: Response) => {
   try {
+    const { username } = req.params;
+    const user = await User.findOne({ username: username.toLowerCase() });
+
+    if (!user) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusCodes.NOT_FOUND,
+        message: "User not found",
+      });
+    }
+
+    const post = await Post.find({ tags: user._id })
+      .populate(postPopulate)
+      .sort({ createdAt: -1 });
+
+    return res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      post,
+    });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
   }
 };
 
-// Get Post by id and comment fill with users username and pic
+// Trending posts by like count
+const getTrendingPosts = async (_req: Request, res: Response) => {
+  try {
+    const posts = await Post.aggregate([
+      {
+        $addFields: {
+          likesCount: { $size: { $ifNull: ["$likes", []] } },
+        },
+      },
+      { $sort: { likesCount: -1, createdAt: -1 } },
+      { $limit: 10 },
+    ]);
+
+    const populated = await Post.populate(posts, postPopulate);
+
+    return res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      post: populated,
+    });
+  } catch (error) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: ReasonPhrases.BAD_REQUEST,
+    });
+  }
+};
+
+// Get post by id with comments filled
 const getPostwithCommment = async (req: Request, res: Response) => {
   const { postId } = req.params;
   try {
-    const post = await Post.findOne({ _id: postId });
+    const post = await Post.findById(postId);
     if (!post) {
-      return;
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusCodes.NOT_FOUND,
+        message: "Post not found",
+      });
     }
 
     const comment = await Promise.all(
       post.comments.map(async (ct: ObjectId) => {
-        const comment = await Comment.findById(ct);
-
-        const user = await User.findById(comment?.author, {
+        const c = await Comment.findById(ct);
+        const user = await User.findById(c?.author, {
           username: true,
           image: true,
         });
-
-        return {
-          user,
-          comment,
-        };
+        return { user, comment: c };
       })
     );
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       message: "",
       comment,
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
@@ -237,4 +320,6 @@ export {
   getAllPost,
   getUserPost,
   getPostwithCommment,
+  getTaggedInPosts,
+  getTrendingPosts,
 };
