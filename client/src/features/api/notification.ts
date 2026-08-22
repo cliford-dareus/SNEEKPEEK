@@ -6,35 +6,31 @@ export const notificationApi = createApi({
   baseQuery,
   tagTypes: ["Notification"],
   endpoints: (builder) => ({
-    // getPost: builder.query({
-    //   query: () => ({
-    //     url: "/post",
-    //     method: "GET",
-    //   }),
-    //   providesTags: (result) =>
-    //     result
-    //       ? [
-    //           ...result.post.map(({ _id }: { _id: string }) => ({
-    //             type: "Post" as const,
-    //             _id,
-    //           })),
-    //         ]
-    //       : ["Post"],
-    // }),
     getNotifications: builder.query({
       query: () => ({
         url: `/notification`,
       }),
       providesTags: ["Notification"],
     }),
-    updateNotification: builder.mutation({
-      query: () => ({
-        url: "",
+    markNotificationRead: builder.mutation({
+      query: (id: string) => ({
+        url: `/notification/${id}/read`,
         method: "PATCH",
       }),
+      invalidatesTags: ["Notification"],
+    }),
+    markAllNotificationsRead: builder.mutation({
+      query: () => ({
+        url: `/notification/read-all`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Notification"],
     }),
   }),
 });
 
-export const { useGetNotificationsQuery, useUpdateNotificationMutation } =
-  notificationApi;
+export const {
+  useGetNotificationsQuery,
+  useMarkNotificationReadMutation,
+  useMarkAllNotificationsReadMutation,
+} = notificationApi;
