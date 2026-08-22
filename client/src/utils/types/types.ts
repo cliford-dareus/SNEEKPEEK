@@ -46,17 +46,19 @@ export interface IFullUserResponse {
     _id: string;
     name: string;
     username: string;
+    image?: string;
     request: IRequestData[];
-    followers: IRequestData [];
-    followings: IRequestData [];
+    followers: IRequestData[];
+    followings: IRequestData[];
     createdAt: string;
     updatedAt: string;
-  }
+  };
 }
 
 export interface IPostPayload {
   content: string;
   image: string;
+  tags?: string[];
 }
 
 export interface IPost {
@@ -66,6 +68,7 @@ export interface IPost {
   image: string;
   likes: ILikes[];
   comments: IComment[];
+  tags?: IRequestData[];
   featured: boolean;
   createdAt: string;
   updatedAt: string;
@@ -90,4 +93,5 @@ export interface IComment {
 export interface IRequestData {
   _id: string;
   username: string;
+  image?: string;
 }
