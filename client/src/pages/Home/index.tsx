@@ -5,9 +5,6 @@ import Loader from "../../components/UI/Loader";
 import Card from "../../components/UI/Card";
 import { useAuth } from "../../lib/hooks/useAuth";
 import { PageContainer, PageTitle } from "../../lib/styled-component/styles";
-import { useEffect } from "react";
-import { socket } from "../../lib/socket/config";
-import { toast } from "react-hot-toast";
 import styled from "styled-components";
 
 const Index = () => {
@@ -21,27 +18,6 @@ const Index = () => {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   };
-
-  useEffect(() => {
-    const handler = ({
-      sender,
-      target,
-      message,
-    }: {
-      sender: { username: string };
-      target: { userId: string };
-      message: string;
-    }) => {
-      if (target.userId === auth.user?.userId) {
-        toast(sender.username + " " + message);
-      }
-    };
-
-    socket.on("notification", handler);
-    return () => {
-      socket.off("notification", handler);
-    };
-  }, [auth.user?.userId]);
 
   const posts = sortedData();
 
@@ -92,5 +68,5 @@ const LoaderWrap = styled.div`
 const Empty = styled.p`
   text-align: center;
   padding: 2em 1em;
-  opacity: 0.7;
+  color: var(--txt--muted);
 `;
