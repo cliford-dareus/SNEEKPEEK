@@ -4,6 +4,12 @@ import { jwtVerify } from "../utils/jwt";
 import { Token } from "../models/Token";
 import { User } from "../models/User";
 
+const unauthorized = (res: Response) =>
+  res.status(StatusCodes.UNAUTHORIZED).json({
+    status: StatusCodes.UNAUTHORIZED,
+    message: ReasonPhrases.UNAUTHORIZED,
+  });
+
 const isAuthenticated = async (
   req: Request,
   res: Response,
@@ -11,49 +17,53 @@ const isAuthenticated = async (
 ) => {
   try {
     const { refreshToken } = req.signedCookies;
-    const authToken = req.get("Authorization");
-    const accessToken = authToken?.split("Bearer ")[1];
+    const authHeader = req.get("Authorization");
+    const accessToken = authHeader?.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : undefined;
 
     if (!accessToken || !refreshToken) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        message: ReasonPhrases.UNAUTHORIZED,
-      });
+      return unauthorized(res);
     }
 
-    // Verify access token is valid JWT
-    jwtVerify({ payload: accessToken });
+    const decodedAccess = jwtVerify({ payload: accessToken });
+    const decodedRefresh = jwtVerify({ payload: refreshToken });
 
-    const decodedRefreshToken = jwtVerify({ payload: refreshToken });
+    const accessUserId = String(decodedAccess.user?.userId ?? "");
+    const refreshUserId = String(decodedRefresh.user?.userId ?? "");
+
+    if (!accessUserId || !refreshUserId || accessUserId !== refreshUserId) {
+      return unauthorized(res);
+    }
+
     const storedToken = await Token.findOne({
-      refreshToken: decodedRefreshToken.refreshToken,
+      refreshToken: decodedRefresh.refreshToken,
+      userId: refreshUserId,
     });
 
     if (!storedToken || !storedToken.isValid) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        message: ReasonPhrases.UNAUTHORIZED,
-      });
+      return unauthorized(res);
     }
 
-    const user = await User.findOne({
-      _id: decodedRefreshToken.user.userId,
-    });
+    if (
+      storedToken.expirationTime &&
+      Number(storedToken.expirationTime) < Date.now()
+    ) {
+      storedToken.isValid = false;
+      await storedToken.save();
+      return unauthorized(res);
+    }
+
+    const user = await User.findById(refreshUserId);
 
     if (!user) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        message: ReasonPhrases.UNAUTHORIZED,
-      });
+      return unauthorized(res);
     }
 
     req.user = user._id;
     next();
-  } catch (error) {
-    return res.status(StatusCodes.UNAUTHORIZED).json({
-      status: StatusCodes.UNAUTHORIZED,
-      message: ReasonPhrases.UNAUTHORIZED,
-    });
+  } catch {
+    return unauthorized(res);
   }
 };
 
