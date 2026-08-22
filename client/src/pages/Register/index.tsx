@@ -10,7 +10,7 @@ const Index = () => {
   return (
     <AuthPageContainer>
       <AuthPageImageContainer>
-        <img src={Image} alt="" />
+        <img src={Image} alt="SneekPeek — join the community" />
       </AuthPageImageContainer>
 
       <AuthPageFormContainer>
