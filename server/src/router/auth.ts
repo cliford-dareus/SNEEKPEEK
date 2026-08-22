@@ -6,7 +6,7 @@ import {
   signOut,
   signUp,
 } from "../controller/auth";
-import isAuthenticated from "../middleware/isAuthenticated ";
+import isAuthenticated from "../middleware/isAuthenticated";
 
 const router = expres.Router();
 
