@@ -1,4 +1,5 @@
 import cors from "cors";
+import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import express from "express";
@@ -6,12 +7,30 @@ import CookieParser from "cookie-parser";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import IO from "./lib/socket/socket";
+
 dotenv.config();
+
+const requiredEnv = ["MONGO_URI", "JWT_SECRET"] as const;
+for (const key of requiredEnv) {
+  if (!process.env[key]) {
+    console.error(`Missing required environment variable: ${key}`);
+    process.exit(1);
+  }
+}
+
+if (process.env.JWT_SECRET!.length < 32) {
+  console.warn(
+    "Warning: JWT_SECRET should be at least 32 characters for production use."
+  );
+}
+
+const CLIENT_ORIGIN =
+  process.env.CLIENT_URL || "https://sneekpeek.netlify.app";
 
 const app = express();
 const httpServer = createServer(app);
 const ioServer = new Server(httpServer, {
-  cors: { origin: "https://sneekpeek.netlify.app" },
+  cors: { origin: CLIENT_ORIGIN, credentials: true },
 });
 
 import authRouter from "./router/auth";
@@ -24,8 +43,14 @@ import notificationRouter from "./router/notification";
 
 import connectDB from "./db/connect";
 
-app.use(cors({ origin: "https://sneekpeek.netlify.app", credentials: true }));
-app.use(express.json());
+app.use(helmet());
+app.use(
+  cors({
+    origin: CLIENT_ORIGIN,
+    credentials: true,
+  })
+);
+app.use(express.json({ limit: "10kb" }));
 app.use(morgan("combined"));
 app.use(CookieParser(process.env.JWT_SECRET));
 
@@ -37,16 +62,15 @@ app.use("/api/v1/conversation", conversationRouter);
 app.use("/api/v1/message", messageRouter);
 app.use("/api/v1/notification", notificationRouter);
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.status(200).send("<h1>Welcome to sneekserver!</h1>");
 });
 
 const PORT = process.env.PORT || 4000;
 
 ioServer.use((socket, next) => {
-  console.log(socket.handshake.auth);
-  const username = socket.handshake.auth.name;
-  const userId = socket.handshake.auth.id;
+  const username = socket.handshake.auth?.name;
+  const userId = socket.handshake.auth?.id;
 
   if (!username || !userId) {
     return next(new Error("Unauthorized: missing auth credentials"));
@@ -66,7 +90,7 @@ const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI!);
     httpServer.listen(PORT, () => {
-      console.log("Listening on port " + PORT);
+      console.log(`Listening on port ${PORT}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);
