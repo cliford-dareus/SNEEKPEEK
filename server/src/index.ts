@@ -1,7 +1,7 @@
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import express, { Request, Response } from "express";
+import express from "express";
 import CookieParser from "cookie-parser";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -37,24 +37,19 @@ app.use("/api/v1/conversation", conversationRouter);
 app.use("/api/v1/message", messageRouter);
 app.use("/api/v1/notification", notificationRouter);
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).send("<h1>Welcome to sneekserver!</h1>");
-})
+});
 
 const PORT = process.env.PORT || 4000;
-
-interface IUser {
-  username: string;
-  userId: string;
-}
 
 ioServer.use((socket, next) => {
   console.log(socket.handshake.auth);
   const username = socket.handshake.auth.name;
   const userId = socket.handshake.auth.id;
 
-  if(!username || !userId) {
-    return 
+  if (!username || !userId) {
+    return next(new Error("Unauthorized: missing auth credentials"));
   }
 
   // @ts-ignore
@@ -73,7 +68,10 @@ const start = async () => {
     httpServer.listen(PORT, () => {
       console.log("Listening on port " + PORT);
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 };
 
 start();
