@@ -7,14 +7,14 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethod>(
   {
     name: {
       type: String,
-      require: true,
+      required: true,
       min: 4,
       max: 20,
       trim: true,
     },
     username: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
       min: 4,
       max: 20,
@@ -22,7 +22,7 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethod>(
     },
     email: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
       trim: true,
       validate: [validator.isEmail, "Invalid email..."],
@@ -33,7 +33,7 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethod>(
     },
     password: {
       type: String,
-      require: true,
+      required: true,
     },
     request: [
       {
@@ -53,8 +53,8 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethod>(
         ref: "User",
       },
     ],
-    followersLength: { tyoe: Number, default: 0 },
-    followingsLength: { tyoe: Number, default: 0 },
+    followersLength: { type: Number, default: 0 },
+    followingsLength: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
