@@ -1,17 +1,47 @@
 import ms from "ms";
+import crypto from "crypto";
 import { User } from "../models/User";
 import { Token } from "../models/Token";
 import { Request, Response } from "express";
 import { StatusCodes, ReasonPhrases } from "http-status-codes";
 import createTokenUser from "../utils/createTokenUser";
 import {
+  ACCESS_TOKEN_TTL,
+  REFRESH_TOKEN_TTL,
   attachCookiesToResponse,
+  clearRefreshCookie,
   clearRefreshToken,
   createAccessToken,
   jwtVerify,
 } from "../utils/jwt";
-import crypto from "crypto";
 import { UserToken } from "../types/typing";
+
+const MIN_PASSWORD_LENGTH = 8;
+
+const isStrongEnoughPassword = (password: string) =>
+  typeof password === "string" && password.length >= MIN_PASSWORD_LENGTH;
+
+const issueSession = async (user: {
+  _id: unknown;
+  username: string;
+}) => {
+  const userToken = createTokenUser(user as any) as UserToken;
+  const refreshToken = crypto.randomBytes(40).toString("hex");
+  const expirationTime = Date.now() + ms(REFRESH_TOKEN_TTL);
+
+  await Token.findOneAndUpdate(
+    { userId: user._id },
+    {
+      refreshToken,
+      userId: user._id,
+      isValid: true,
+      expirationTime: String(expirationTime),
+    },
+    { upsert: true, new: true }
+  );
+
+  return { userToken, refreshToken };
+};
 
 // Sign Up
 const signUp = async (req: Request, res: Response) => {
@@ -21,25 +51,32 @@ const signUp = async (req: Request, res: Response) => {
     if (!name || !username || !email || !password) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
-        message: ReasonPhrases.BAD_REQUEST,
+        message: "Name, username, email, and password are required",
+      });
+    }
+
+    if (!isStrongEnoughPassword(password)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        message: `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
       });
     }
 
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }],
+      $or: [{ email: email.toLowerCase() }, { username: username.toLowerCase() }],
     });
 
     if (existingUser) {
       return res.status(StatusCodes.CONFLICT).json({
         status: StatusCodes.CONFLICT,
-        message: ReasonPhrases.CONFLICT,
+        message: "An account with that email or username already exists",
       });
     }
 
     await User.create({
       name,
-      username,
-      email,
+      username: username.toLowerCase(),
+      email: email.toLowerCase(),
       password,
     });
 
@@ -63,74 +100,39 @@ const signIn = async (req: Request, res: Response) => {
     if (!username || !password) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
-        message: ReasonPhrases.BAD_REQUEST,
+        message: "Username and password are required",
       });
     }
 
-    const user = await User.findOne({ username });
-    const isPasswordCorrect = await user?.comparePassword(password);
+    // password has select: false — must opt in
+    const user = await User.findOne({ username: username.toLowerCase() }).select(
+      "+password"
+    );
 
-    if (!isPasswordCorrect || !user) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusCodes.BAD_REQUEST,
-        message: ReasonPhrases.BAD_REQUEST,
+    // Constant-ish response: do not reveal whether username exists
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        message: "Invalid credentials",
       });
     }
 
-    const UserTokenPayload = createTokenUser(user) as UserToken;
+    const { userToken, refreshToken } = await issueSession(user);
 
-    let refreshToken = "";
-    const isTokenExist = await Token.findOne({ userId: user._id });
-
-    if (isTokenExist) {
-      const { isValid } = isTokenExist;
-
-      if (!isValid) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
-          status: StatusCodes.BAD_REQUEST,
-          message: ReasonPhrases.BAD_REQUEST,
-        });
-      }
-
-      refreshToken = isTokenExist.refreshToken;
-      attachCookiesToResponse({
-        res,
-        user: UserTokenPayload,
-        refreshToken,
-      });
-      const accessToken = createAccessToken(UserTokenPayload);
-      return res.status(StatusCodes.OK).json({
-        status: StatusCodes.OK,
-        user: {
-          ...UserTokenPayload,
-          accessToken,
-          expiresAt: new Date(Date.now() + ms("15m")),
-        },
-      });
-    }
-
-    refreshToken = crypto.randomBytes(40).toString("hex");
-
-    const tokenUser = {
-      refreshToken,
-      userId: user._id,
-      expirationTime: new Date(Date.now() + ms("1d")).getTime(),
-    };
-
-    await Token.create(tokenUser);
     attachCookiesToResponse({
       res,
-      user: UserTokenPayload,
+      user: userToken,
       refreshToken,
     });
-    const accessToken = createAccessToken(UserTokenPayload);
+
+    const accessToken = createAccessToken(userToken);
 
     return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       user: {
-        ...UserTokenPayload,
+        ...userToken,
         accessToken,
-        expiresAt: new Date(Date.now() + ms("15m")),
+        expiresAt: new Date(Date.now() + ms(ACCESS_TOKEN_TTL)),
       },
     });
   } catch (error) {
@@ -146,39 +148,24 @@ const signOut = async (req: Request, res: Response) => {
   try {
     const userId = req.user;
 
-    const user = await User.findById(userId);
+    await Token.findOneAndDelete({ userId });
 
-    if (!user) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusCodes.BAD_REQUEST,
-        message: ReasonPhrases.BAD_REQUEST,
-      });
-    }
-
-    await Token.findOneAndUpdate(
-      { userId: user._id },
-      { refreshToken: "", expirationTime: "" }
-    );
-
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: false,
-      signed: true,
-    });
+    clearRefreshCookie(res);
 
     return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       message: "User logged out",
     });
   } catch (error) {
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      status: StatusCodes.BAD_REQUEST,
-      message: ReasonPhrases.BAD_REQUEST,
+    clearRefreshCookie(res);
+    return res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: "User logged out",
     });
   }
 };
 
-// Refresh Token
+// Refresh Token (rotates refresh token on each successful refresh)
 const refreshTokenFn = async (req: Request, res: Response) => {
   const { refreshToken } = req.signedCookies;
 
@@ -188,11 +175,12 @@ const refreshTokenFn = async (req: Request, res: Response) => {
 
   try {
     const decodedRefreshToken = jwtVerify({ payload: refreshToken });
-    const isTokenExist = await Token.findOne({
+    const storedToken = await Token.findOne({
       refreshToken: decodedRefreshToken?.refreshToken,
+      userId: decodedRefreshToken?.user?.userId,
     });
 
-    if (!isTokenExist) {
+    if (!storedToken || !storedToken.isValid) {
       await clearRefreshToken(req, res, false);
       return res.status(StatusCodes.UNAUTHORIZED).json({
         status: StatusCodes.UNAUTHORIZED,
@@ -200,9 +188,19 @@ const refreshTokenFn = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findOne({
-      _id: decodedRefreshToken?.user?.userId,
-    });
+    if (
+      storedToken.expirationTime &&
+      Number(storedToken.expirationTime) < Date.now()
+    ) {
+      await Token.findByIdAndDelete(storedToken._id);
+      clearRefreshCookie(res);
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        message: ReasonPhrases.UNAUTHORIZED,
+      });
+    }
+
+    const user = await User.findById(decodedRefreshToken?.user?.userId);
 
     if (!user) {
       await clearRefreshToken(req, res, true);
@@ -212,29 +210,37 @@ const refreshTokenFn = async (req: Request, res: Response) => {
       });
     }
 
-    const UserTokenPayload = {
-      username: user.username,
-      userId: user._id,
-    };
-    const accessToken = createAccessToken(UserTokenPayload);
+    // Rotate refresh token
+    const { userToken, refreshToken: newRefreshToken } = await issueSession(
+      user
+    );
+
+    attachCookiesToResponse({
+      res,
+      user: userToken,
+      refreshToken: newRefreshToken,
+    });
+
+    const accessToken = createAccessToken(userToken);
 
     return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       user: {
-        ...UserTokenPayload,
+        ...userToken,
         accessToken,
-        expiresAt: new Date(Date.now() + ms("15m")),
+        expiresAt: new Date(Date.now() + ms(ACCESS_TOKEN_TTL)),
       },
     });
   } catch (error) {
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      status: StatusCodes.BAD_REQUEST,
-      message: ReasonPhrases.BAD_REQUEST,
+    clearRefreshCookie(res);
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      status: StatusCodes.UNAUTHORIZED,
+      message: ReasonPhrases.UNAUTHORIZED,
     });
   }
 };
 
-// Reset Password
+// Reset Password (authenticated change)
 const resetPassword = async (req: Request, res: Response) => {
   const userId = req.user;
   const { oldpassword, newpassword } = req.body;
@@ -242,12 +248,26 @@ const resetPassword = async (req: Request, res: Response) => {
   if (!oldpassword || !newpassword) {
     return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
-      message: "Both fields are required...",
+      message: "Both current and new password are required",
+    });
+  }
+
+  if (!isStrongEnoughPassword(newpassword)) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: `New password must be at least ${MIN_PASSWORD_LENGTH} characters`,
+    });
+  }
+
+  if (oldpassword === newpassword) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      status: StatusCodes.BAD_REQUEST,
+      message: "New password must be different from the current password",
     });
   }
 
   try {
-    const user = await User.findOne({ _id: userId });
+    const user = await User.findById(userId).select("+password");
 
     if (!user) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -258,18 +278,22 @@ const resetPassword = async (req: Request, res: Response) => {
 
     const isMatch = await user.comparePassword(oldpassword);
     if (!isMatch) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusCodes.BAD_REQUEST,
-        message: "Incorrect current password",
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        message: "Invalid credentials",
       });
     }
 
     user.password = newpassword;
     await user.save();
 
+    // Invalidate all sessions after password change
+    await Token.deleteMany({ userId: user._id });
+    clearRefreshCookie(res);
+
     return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
-      message: "Password updated successfully",
+      message: "Password updated successfully. Please sign in again.",
     });
   } catch (error) {
     return res.status(StatusCodes.BAD_REQUEST).json({
