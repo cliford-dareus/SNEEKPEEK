@@ -13,41 +13,63 @@ export const postApi = createApi({
         method: "GET",
       }),
       providesTags: (result) =>
-        result
+        result?.post
           ? [
               ...result.post.map(({ _id }: { _id: string }) => ({
                 type: "Post" as const,
-                _id,
+                id: _id,
               })),
+              { type: "Post", id: "LIST" },
             ]
-          : ["Post"],
+          : [{ type: "Post", id: "LIST" }],
     }),
     getUserPost: builder.query({
-      query: (username) => ({
+      query: (username: string) => ({
         url: `/post/personal/${username}`,
       }),
+      providesTags: [{ type: "Post", id: "LIST" }],
+    }),
+    getTaggedPosts: builder.query({
+      query: (username: string) => ({
+        url: `/post/tagged/${username}`,
+      }),
+      providesTags: [{ type: "Post", id: "LIST" }],
+    }),
+    getTrendingPosts: builder.query({
+      query: () => ({
+        url: "/post/trending",
+      }),
+      providesTags: [{ type: "Post", id: "LIST" }],
     }),
     post: builder.mutation<Partial<IPost>, IPostPayload>({
-      query: (postPaylod) => ({
+      query: (postPayload) => ({
         url: "/post",
         method: "POST",
-        body: postPaylod,
+        body: postPayload,
       }),
-      invalidatesTags: ["Post"],
+      invalidatesTags: [{ type: "Post", id: "LIST" }],
     }),
     updatePost: builder.mutation({
-      query: ({ postId, ...rest }) => ({
-        url: `/post/${postId}`,
+      query: ({ postId, content, image, tags }) => ({
+        url: `/post/edit`,
         method: "PATCH",
-        body: rest,
+        body: { postId, content, image, tags },
       }),
+      invalidatesTags: [{ type: "Post", id: "LIST" }],
+    }),
+    deletePost: builder.mutation({
+      query: (postId: string) => ({
+        url: `/post/${postId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Post", id: "LIST" }],
     }),
     likeOrUnlikePost: builder.mutation({
-      query: (postId) => ({
+      query: (postId: string) => ({
         url: `/post/${postId}`,
         method: "PATCH",
       }),
-      invalidatesTags: (arg) => [{ type: "Post", id: arg.id }],
+      invalidatesTags: [{ type: "Post", id: "LIST" }],
     }),
   }),
 });
@@ -55,7 +77,10 @@ export const postApi = createApi({
 export const {
   useGetPostQuery,
   useGetUserPostQuery,
+  useGetTaggedPostsQuery,
+  useGetTrendingPostsQuery,
   usePostMutation,
   useUpdatePostMutation,
+  useDeletePostMutation,
   useLikeOrUnlikePostMutation,
 } = postApi;
