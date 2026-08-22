@@ -9,11 +9,12 @@ const PostSchema = new mongoose.Schema(
     },
     content: {
       type: String,
-      max: 500,
+      maxlength: 500,
     },
     image: { type: String },
     likes: [{ type: mongoose.Types.ObjectId, ref: "User" }],
     comments: [{ type: mongoose.Types.ObjectId, ref: "Comment" }],
+    tags: [{ type: mongoose.Types.ObjectId, ref: "User" }],
     featured: {
       type: Boolean,
       default: false,
