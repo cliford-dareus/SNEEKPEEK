@@ -1,5 +1,5 @@
 import express from "express";
-import isAuthenticated from "../middleware/isAuthenticated ";
+import isAuthenticated from "../middleware/isAuthenticated";
 import {
   addNewMessage,
   getAllMessage,
