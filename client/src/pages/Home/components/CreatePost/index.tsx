@@ -54,7 +54,7 @@ const Index = () => {
 
   return (
     <CreatePostContainer>
-      <CreatePostImage />
+      <CreatePostImage aria-hidden />
       <CreatePostContent>
         <form onSubmit={handleSubmit}>
           <CreatePostInput
@@ -107,40 +107,55 @@ export default Index;
 
 const CreatePostContainer = styled.div`
   background-color: var(--dark--color-800);
-  margin-top: 1em;
-  border-radius: 10px;
-  padding: 1em;
+  border: 1px solid var(--border-subtle);
+  margin-top: 0.25em;
+  border-radius: var(--radius-md);
+  padding: 1.1em;
   display: flex;
-  gap: 1em;
+  gap: 0.9em;
   position: relative;
+  box-shadow: var(--shadow-sm);
 `;
 
 const CreatePostImage = styled.div`
-  width: 40px;
+  width: 42px;
   aspect-ratio: 1;
   border-radius: 50%;
-  background-color: aliceblue;
+  background-color: var(--dark--color-700);
+  border: 1px solid var(--border-subtle);
   align-self: flex-start;
+  flex-shrink: 0;
 `;
 
 const CreatePostContent = styled.div`
   flex: 1;
+  min-width: 0;
 `;
 
 const CreatePostInput = styled.input`
   width: 100%;
   outline: none;
-  border: none;
-  padding: 0.5em 1em;
-  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  padding: 0.7em 1em;
+  border-radius: var(--radius-md);
   background-color: var(--dark--color-900);
-  color: white;
-  font-size: 1.1rem;
+  color: var(--txt--color-100);
+  font-size: 1rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: var(--light--color-600);
+  }
+
+  &:focus {
+    border-color: var(--primary--color-400);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+  }
 `;
 
 const TagsInput = styled(CreatePostInput)`
-  margin-top: 0.5em;
-  font-size: 0.95rem;
+  margin-top: 0.55em;
+  font-size: 0.9rem;
 `;
 
 const CreatePostContentActions = styled.div`
@@ -148,7 +163,7 @@ const CreatePostContentActions = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 0.75em;
-  margin-top: 1em;
+  margin-top: 0.9em;
   flex-wrap: wrap;
 `;
 
@@ -157,5 +172,5 @@ const TagHint = styled.span`
   align-items: center;
   gap: 0.35em;
   font-size: 0.8rem;
-  opacity: 0.7;
+  color: var(--txt--muted);
 `;
