@@ -68,6 +68,7 @@ export interface IPost {
   image: string;
   likes: ObjectId[];
   comments: ObjectId[];
+  tags: ObjectId[];
   featured: boolean;
 }
 
