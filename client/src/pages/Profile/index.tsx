@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Button from "../../components/UI/Button";
 import BackButton from "../../components/UI/BackButton";
 import ProfileDetails from "./components/ProfileDetails";
-import { Link, NavLink, Outlet, useParams } from "react-router-dom";
+import { NavLink, Outlet, useParams } from "react-router-dom";
 import {
   useFollowUserMutation,
   useGetUserByUsernameQuery,
@@ -14,33 +14,42 @@ import { socket } from "../../lib/socket/config";
 import { selectCurrentUser } from "../../features/slice/authSlice";
 import { IFullUserResponse } from "../../utils/types/types";
 import Trending from "../../components/SideContent/trending";
+import toast from "react-hot-toast";
 
 const Index = () => {
   const { name } = useParams();
   const user = useAppSelector(selectCurrentUser);
-  const [followUser] = useFollowUserMutation();
+  const [followUser, { isLoading: isFollowing }] = useFollowUserMutation();
   const { data: currentUser } = useGetUserByUsernameQuery(name, {
     refetchOnMountOrArgChange: true,
   });
 
   const onFollowUser = async () => {
+    if (!name || !user.user) return;
+
     try {
-      await followUser({ username: name });
+      const result = await followUser({ username: name }).unwrap();
+
+      const target = result?.target || {
+        userId: currentUser?.user._id,
+        username: currentUser?.user.username,
+      };
 
       socket.emit("notification", {
         sender: {
-          userId: user.user?.userId,
-          username: user.user?.username,
+          userId: user.user.userId,
+          username: user.user.username,
         },
-        target: {
-          userId: currentUser?.user._id,
-          username: currentUser?.user.username,
-        },
-        type: "FOLLOW",
-        message: "is following you " + name,
+        target,
+        type: "REQUEST",
+        message: "sent you a follow request",
       });
-    } catch (error) {
-      console.log(error);
+
+      toast.success("Follow request sent");
+    } catch (error: any) {
+      const msg =
+        error?.data?.message || "Could not send follow request";
+      toast.error(msg);
     }
   };
 
@@ -59,7 +68,11 @@ const Index = () => {
 
           {name !== user?.user?.username ? (
             <ProfileBtn onClick={onFollowUser}>
-              <Button label="Follow" isLoading={false} color={true} />
+              <Button
+                label="Follow"
+                isLoading={isFollowing}
+                color={true}
+              />
             </ProfileBtn>
           ) : (
             <ProfileBtn>
