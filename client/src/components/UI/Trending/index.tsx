@@ -1,8 +1,1 @@
-
-const Index = () => {
-  return (
-    <div>index</div>
-  )
-}
-
-export default Index
+export { default } from "../../SideContent/trending";
