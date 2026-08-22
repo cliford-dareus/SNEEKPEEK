@@ -77,7 +77,7 @@ const LoaderWrap = styled.div`
 const Empty = styled.p`
   text-align: center;
   padding: 1.5em 0.5em;
-  opacity: 0.7;
+  color: var(--txt--muted);
   font-size: 0.95rem;
 `;
 
@@ -87,21 +87,23 @@ const List = styled.ul`
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75em;
+  gap: 0.65em;
 `;
 
 const Item = styled.li`
   display: flex;
   gap: 0.75em;
   padding: 0.75em;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--dark--color-900);
+  border: 1px solid var(--border-subtle);
 `;
 
 const Rank = styled.span`
   font-weight: 700;
   color: var(--primary--color-400);
   min-width: 2em;
+  font-size: 0.9rem;
 `;
 
 const Body = styled.div`
@@ -113,6 +115,10 @@ const Author = styled(Link)`
   color: var(--primary--color-400);
   font-weight: 600;
   font-size: 0.9rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const Snippet = styled.p`
@@ -120,11 +126,12 @@ const Snippet = styled.p`
   font-size: 0.85rem;
   line-height: 1.35;
   word-break: break-word;
+  color: var(--txt--color-200);
 `;
 
 const Meta = styled.div`
   display: flex;
   gap: 0.35em;
   font-size: 0.75rem;
-  opacity: 0.65;
+  color: var(--txt--muted);
 `;
