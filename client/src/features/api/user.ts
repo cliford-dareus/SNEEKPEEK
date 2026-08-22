@@ -7,21 +7,6 @@ export const userApi = createApi({
   baseQuery,
   tagTypes: ["User"],
   endpoints: (builder) => ({
-    // getPost: builder.query({
-    //   query: () => ({
-    //     url: "/post",
-    //     method: "GET",
-    //   }),
-    //   providesTags: (result) =>
-    //     result
-    //       ? [
-    //           ...result.post.map(({ _id }: { _id: string }) => ({
-    //             type: "Post" as const,
-    //             _id,
-    //           })),
-    //         ]
-    //       : ["Post"],
-    // }),
     getUserByUsername: builder.query<IFullUserResponse, string | undefined>({
       query: (username) => ({
         url: `/user/${username}`,
@@ -31,13 +16,20 @@ export const userApi = createApi({
     followUser: builder.mutation({
       query: (payload) => ({
         url: `/user/follow/${payload.username}`,
-        method: 'POST'
+        method: "POST",
       }),
-      invalidatesTags: ['User']
+      invalidatesTags: ["User", "Notification" as any],
     }),
     acceptRequest: builder.mutation({
-      query: (userId) => ({
+      query: (userId: string) => ({
         url: `/user/accept-request/${userId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["User"],
+    }),
+    declineRequest: builder.mutation({
+      query: (userId: string) => ({
+        url: `/user/decline-request/${userId}`,
         method: "POST",
       }),
       invalidatesTags: ["User"],
@@ -59,6 +51,7 @@ export const {
   useGetUserByUsernameQuery,
   useFollowUserMutation,
   useAcceptRequestMutation,
+  useDeclineRequestMutation,
   useSearchUserQuery,
   useGetUserByIdQuery,
 } = userApi;
