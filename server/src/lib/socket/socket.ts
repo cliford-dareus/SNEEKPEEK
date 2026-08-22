@@ -1,42 +1,51 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
+
+const roomFor = (userId: string, username: string) =>
+  `${String(userId)}:${String(username)}`;
 
 const IO = (
   ioServer: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => {
-  ioServer.on("connection", (socket) => {
+  ioServer.on("connection", (socket: Socket) => {
     // @ts-ignore
-    console.log(`⚡: ${socket.username} ${socket.userId}user just connected!`);
+    const userId = String(socket.userId || "");
     // @ts-ignore
-    socket.join(socket.userId + socket.username);
-    console.log(socket.rooms);
+    const username = String(socket.username || "");
+
+    const myRoom = roomFor(userId, username);
+    socket.join(myRoom);
 
     socket.on("private_message", ({ sender, reciever, message }) => {
-      const room = sender.userId + sender.username;
-      const room2 = reciever.userId + reciever.username;
-      console.log("ROOM 1 " + room + " ROOM 2 " + room2);
+      if (!sender?.userId || !reciever?.userId) return;
 
-      socket
-        .to([room, room2])
+      const room1 = roomFor(sender.userId, sender.username);
+      const room2 = roomFor(reciever.userId, reciever.username);
+
+      ioServer
+        .to([room1, room2])
         .emit("private_message", { sender, reciever, message });
     });
 
+    // Relay only — persistence is handled by REST controllers
     socket.on("notification", ({ sender, target, type, message }) => {
-      const room = sender.userId + sender.username;
-      const room2 = target.userId + target.username;
-      console.log("ROOM 1 " + room + " ROOM 2 " + room2);
+      if (!target?.userId || !target?.username) return;
 
-      socket
-        .to([room, room2])
-        .emit("notification", { sender, target,type, message });
+      const targetRoom = roomFor(target.userId, target.username);
+
+      ioServer.to(targetRoom).emit("notification", {
+        sender,
+        target,
+        type: type || "GENERAL",
+        message: message || "",
+      });
     });
 
     socket.on("disconnect", () => {
-      // @ts-ignore
-      console.log(socket.username + "disconnect");
-      socket.disconnect();
+      socket.leave(myRoom);
     });
   });
 };
 
 export default IO;
+export { roomFor };
