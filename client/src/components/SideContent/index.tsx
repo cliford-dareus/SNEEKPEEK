@@ -1,4 +1,3 @@
-
 import styled from "styled-components";
 import { LoginForm } from "../AuthForm";
 import { useAppSelector } from "../../app/hooks";
@@ -11,12 +10,7 @@ const Index = ({ children }: { children: React.ReactNode }) => {
   return (
     <SideContentContainer>
       {isLogin ? (
-        <div>
-          <SideContentTop>{children}</SideContentTop>
-          {/* <div>
-            <h3>Friends</h3>
-          </div> */}
-        </div>
+        <SideContentTop>{children}</SideContentTop>
       ) : (
         <LoginForm />
       )}
@@ -31,16 +25,27 @@ const SideContentContainer = styled.aside`
 
   @media screen and (min-width: 855px) {
     display: block;
-    border-radius: 10px;
     min-width: 280px;
-    max-width: 300px;
+    max-width: 320px;
     flex: 1;
   }
 `;
 
 const SideContentTop = styled.div`
-  padding: 1em;
+  padding: 1.1em;
   background-color: var(--dark--color-800);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  max-height: calc(100vh - var(--header-height) - 2em);
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--dark--color-700);
+    border-radius: var(--radius-full);
+  }
 `;
-
-
