@@ -10,18 +10,32 @@ export const FlexCol = styled.div`
   flex-direction: column;
 `;
 
+/** Standard elevated panel used across feed, sidebars, cards */
+export const Surface = styled.div`
+  background-color: var(--dark--color-800);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+`;
+
 export const PageContainer = styled(motion.div)`
   flex: 1;
   flex-shrink: 0;
-  height: calc(100vh - 60px - 1em);
+  height: calc(100vh - var(--header-height) - 1em);
   overscroll-behavior-y: contain;
-  overflow-y: scroll;
+  overflow-y: auto;
   position: relative;
-  max-width: 500px;
-  min-width: 300px;
+  max-width: 560px;
+  min-width: 280px;
+  padding-bottom: 1.5em;
 
   &::-webkit-scrollbar {
-    display: none;
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--dark--color-700);
+    border-radius: var(--radius-full);
   }
 
   @media screen and (min-width: 1035px) {
@@ -46,9 +60,9 @@ export const FormContainer = styled.div`
   max-width: 420px;
   padding: 2em 1.75em;
   background-color: var(--dark--color-800);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-md);
 `;
 
 export const Form = styled.form`
@@ -68,10 +82,10 @@ export const Form = styled.form`
 export const InputField = styled.input`
   width: 100%;
   display: flex;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 1rem;
   padding: 0.75em 1em;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-strong);
   outline: none;
   background-color: var(--dark--color-900);
   color: var(--txt--color-100);
@@ -83,7 +97,7 @@ export const InputField = styled.input`
 
   &:focus {
     border-color: var(--primary--color-400);
-    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+    box-shadow: 0 0 0 3px var(--focus-ring);
   }
 `;
 
@@ -136,17 +150,21 @@ export const AuthPageImageContainer = styled.div`
 
 export const PageTitle = styled.div`
   width: 100%;
-  padding: 1em;
-  line-height: 0.5;
+  padding: 1em 1.15em;
+  line-height: 1.2;
   position: sticky;
-  border-radius: 10px;
-  z-index: 99999;
+  border-radius: var(--radius-md);
+  z-index: 50;
   top: 0;
   background-color: var(--dark--color-800);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 0.75em;
 
   h1 {
-    font-size: 1.333rem;
+    font-size: 1.25rem;
     font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
   div:nth-of-type(2) {
@@ -156,5 +174,22 @@ export const PageTitle = styled.div`
 
 export const Container = styled.div`
   width: 100%;
-  height: 350px;
+  max-height: 420px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--dark--color-700);
+    border-radius: var(--radius-full);
+  }
+`;
+
+export const EmptyState = styled.p`
+  text-align: center;
+  padding: 2em 1em;
+  color: var(--txt--muted);
+  font-size: 0.95rem;
 `;
