@@ -111,7 +111,7 @@ export const AuthPageFormContainer = styled.div`
 
   @media screen and (min-width: 900px) {
     flex: 0 0 48%;
-    max-width: 520px;
+    /*max-width: 520px;*/
     margin: 0 auto;
   }
 `;

@@ -246,7 +246,7 @@ const Input = styled.input`
   font-size: 1rem;
 `;
 
-const MessageInputContainer = styled.div`
+export const MessageInputContainer = styled.div`
   width: 100%;
   min-height: 40px;
   padding: 0.35em 1em;

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { InputContainer } from "../Chat";
 import { useAppSelector } from "../../app/hooks";
 import { BsPlusCircle } from "react-icons/bs";
 import { IAuthInitialState } from "../../utils/types/types";
@@ -13,6 +12,7 @@ import SearchModal from "../../components/UI/SearchModal";
 import { socketConnect } from "../../lib/socket/config";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { MessageInputContainer } from "../Chat";
 
 const Index = () => {
   const user = useAppSelector(selectCurrentUser) as IAuthInitialState;
@@ -36,14 +36,14 @@ const Index = () => {
         style={{ display: "flex", flexDirection: "column", gap: "1em" }}
       >
         <PageTitle>
-          <InputContainer style={{ justifyContent: "space-between" }}>
+          <MessageInputContainer style={{ justifyContent: "space-between" }}>
             <h1>Messages</h1>
             <span>
               <BsPlusCircle />
             </span>
-          </InputContainer>
+          </MessageInputContainer>
 
-          <InputContainer>
+          <MessageInputContainer>
             <p style={{ marginRight: "1em" }}>To: </p>
             <Input
               type="text"
@@ -52,7 +52,7 @@ const Index = () => {
             />
 
             {searchTerm ? <SearchModal data={{ searchTerm }} /> : ""}
-          </InputContainer>
+          </MessageInputContainer>
         </PageTitle>
 
         <div

@@ -29,7 +29,7 @@ export const SidebarContainer = styled.aside`
 `;
 
 export const Navigation = styled.nav`
-  width: 100%;
+  /*width: 100%;*/
   height: 100%;
 `;
 
