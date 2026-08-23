@@ -1,7 +1,6 @@
 import { User } from "../models/User";
 import { Request, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
-import { checkUserIdentity } from "../utils/checkUserIdentity";
 import Notification from "../models/Notifications";
 
 const getUser = async (req: Request, res: Response) => {
@@ -12,13 +11,13 @@ const getUser = async (req: Request, res: Response) => {
       throw new Error("user does not exist");
     }
     const { password, __v, ...otherInfo } = user.toObject();
-    res.status(200).send({
+    return res.status(200).send({
       status: "success",
       message: "user info",
       user: otherInfo,
     });
   } catch (e) {
-    res.status(500).send({
+    return res.status(500).send({
       status: "failure",
       message: ReasonPhrases.BAD_REQUEST,
     });
@@ -143,7 +142,9 @@ const followUser = async (req: Request, res: Response) => {
   const id = req.user;
 
   try {
-    const userToFollow = await User.findOne({ username: username.toLowerCase() });
+    const userToFollow = await User.findOne({
+      username: username.toLowerCase(),
+    });
 
     if (!userToFollow) {
       return res.status(StatusCodes.BAD_REQUEST).json({
