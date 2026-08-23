@@ -9,13 +9,17 @@ import {
 } from "react-icons/bs";
 import UserProfile from "../../../assets/user.jpg";
 import { Flex } from "../../../lib/styled-component/styles";
-import { useAppSelector } from "../../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import {
   useGetNotificationsQuery,
   useMarkAllNotificationsReadMutation,
   useMarkNotificationReadMutation,
 } from "../../../features/api/notification";
 import { selectCurrentUser } from "../../../features/slice/authSlice";
+import {
+  clearSocialUnread,
+  setSocialUnread,
+} from "../../../features/slice/inboxSlice";
 import { useEffect } from "react";
 import { LoaderContainer } from "../../../pages/Profile";
 import Loader from "../Loader";
@@ -23,7 +27,6 @@ import {
   useAcceptRequestMutation,
   useDeclineRequestMutation,
 } from "../../../features/api/user";
-import { socket } from "../../../lib/socket/config";
 import { toast } from "react-hot-toast";
 import {
   Icon,
@@ -67,6 +70,7 @@ const notificationCopy = (n: {
 };
 
 const Index = () => {
+  const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
   const isAuthed = Boolean(user.token && user.user?.userId);
   const [acceptRequest] = useAcceptRequestMutation();
@@ -77,7 +81,21 @@ const Index = () => {
     skip: !isAuthed,
   });
 
-  const handleAcceptRequest = async (senderId: string, notificationId: string) => {
+  const notifications = data?.notifications ?? [];
+  const unread = notifications.filter(
+    (n: { status: string }) => n.status === "RECEIVED"
+  );
+
+  // Keep navbar bell in sync with server unread activity
+  useEffect(() => {
+    if (!isAuthed) return;
+    dispatch(setSocialUnread(unread.length));
+  }, [isAuthed, unread.length, dispatch]);
+
+  const handleAcceptRequest = async (
+    senderId: string,
+    notificationId: string
+  ) => {
     try {
       await acceptRequest(senderId).unwrap();
       await markRead(notificationId);
@@ -98,40 +116,6 @@ const Index = () => {
       toast.error("Could not decline request");
     }
   };
-
-  useEffect(() => {
-    if (!isAuthed) return;
-
-    const handler = ({
-      sender,
-      target,
-      message,
-      type,
-    }: {
-      sender: { username: string; userId: string };
-      target: { userId: string };
-      message?: string;
-      type?: string;
-    }) => {
-      if (String(target.userId) !== String(user.user?.userId)) return;
-
-      const text =
-        message ||
-        notificationCopy({ type, message, sender });
-      toast(`${sender.username} ${text}`);
-      refetch();
-    };
-
-    socket.on("notification", handler);
-    return () => {
-      socket.off("notification", handler);
-    };
-  }, [isAuthed, user.user?.userId, refetch]);
-
-  const notifications = data?.notifications ?? [];
-  const unread = notifications.filter(
-    (n: { status: string }) => n.status === "RECEIVED"
-  );
 
   return (
     <SidebarContainer>
@@ -178,6 +162,7 @@ const Index = () => {
                 onClick={async () => {
                   try {
                     await markAllRead(undefined).unwrap();
+                    dispatch(clearSocialUnread());
                     refetch();
                   } catch {
                     toast.error("Could not mark all as read");
