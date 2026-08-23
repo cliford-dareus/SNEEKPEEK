@@ -26,7 +26,6 @@ import {
   HeaderProfileModal,
   Icon,
   IconBadge,
-  IconLink,
   IconWrap,
   InboxDropdown,
   InboxEmpty,
@@ -136,10 +135,6 @@ const Index = () => {
             </InboxDropdown>
           )}
         </IconWrap>
-
-        <IconLink to="/messages" title="Messages inbox">
-          {/* secondary entry kept via dropdown; this is optional spacing none */}
-        </IconLink>
 
         <HeaderProfileContainer>
           <Link to={`/${user.user?.username || ""}`}>
