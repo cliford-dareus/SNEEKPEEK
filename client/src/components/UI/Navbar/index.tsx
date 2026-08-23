@@ -6,8 +6,20 @@ import SneekLogo from "../../../assets/Sneekpeek.svg";
 import Profile from "../../../assets/user.jpg";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { useSignOutUserMutation } from "../../../features/api/auth";
-import { removeCredentials, selectCurrentUser } from "../../../features/slice/authSlice";
-import { Header, HeaderActions, HeaderInput, HeaderInputContainer, HeaderProfileContainer, HeaderProfileModal, Icon, LogoContainer } from "./styles";
+import {
+  removeCredentials,
+  selectCurrentUser,
+} from "../../../features/slice/authSlice";
+import {
+  Header,
+  HeaderActions,
+  HeaderInput,
+  HeaderInputContainer,
+  HeaderProfileContainer,
+  HeaderProfileModal,
+  Icon,
+  LogoContainer,
+} from "./styles";
 
 const Index = () => {
   const dispatch = useAppDispatch();
@@ -18,16 +30,16 @@ const Index = () => {
   const handleSignout = async () => {
     try {
       await signout({});
+    } finally {
       dispatch(removeCredentials());
-    } catch (error) {
-      console.log(error);
+      setOpen(false);
     }
   };
 
   return (
     <Header>
       <LogoContainer to="/">
-        <img src={SneekLogo} alt="logo" />
+        <img src={SneekLogo} alt="SneekPeek" />
       </LogoContainer>
 
       <HeaderInputContainer>
@@ -46,12 +58,11 @@ const Index = () => {
         </Icon>
 
         <HeaderProfileContainer>
-          <Link to={`${user.user?.username}`}>
+          <Link to={`${user.user?.username || ""}`}>
             <img src={Profile} alt="" />
           </Link>
           <p>{user.user?.username}</p>
           <Icon onClick={() => setOpen(!open)}>
-            {/* When drop down is open flip the icon */}
             <BsChevronDown />
           </Icon>
 
