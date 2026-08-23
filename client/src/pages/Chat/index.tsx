@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { BsEmojiSmile } from "react-icons/bs";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import Button from "../../components/UI/Button";
 import BackButton from "../../components/UI/BackButton";
@@ -16,6 +16,7 @@ import {
   useUpdateMessageStatusMutation,
 } from "../../features/api/message";
 import { selectCurrentUser } from "../../features/slice/authSlice";
+import { clearMessagesFrom } from "../../features/slice/inboxSlice";
 import { useGetConversationsQuery } from "../../features/api/conversations";
 import toast from "react-hot-toast";
 
@@ -27,6 +28,7 @@ interface IMessage {
 
 const Index = () => {
   const { id, name } = useParams();
+  const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser) as IAuthInitialState;
 
   const [input, setInput] = useState("");
@@ -41,6 +43,13 @@ const Index = () => {
   const { data, refetch } = useGetMessagesQuery(id);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Clear navbar badge for this conversation partner
+  useEffect(() => {
+    if (name) {
+      dispatch(clearMessagesFrom({ username: name }));
+    }
+  }, [name, dispatch]);
 
   useEffect(() => {
     if (data?.message?.messages === undefined) {
@@ -101,13 +110,14 @@ const Index = () => {
     setInput((prev) => prev + emoji.emoji);
   };
 
+  // Only append messages from the open thread (global listener handles toasts elsewhere)
   useEffect(() => {
     const handler = async ({
       sender,
       reciever,
       message,
     }: {
-      sender: { _id?: string; username: string };
+      sender: { _id?: string; username: string; userId?: string };
       reciever: { username: string };
       message: string;
     }) => {
@@ -118,13 +128,15 @@ const Index = () => {
         setArrivalMessage({
           status: "DELIVERED",
           content: message,
-          sender: { _id: sender._id, username: sender.username },
+          sender: {
+            _id: sender._id || sender.userId,
+            username: sender.username,
+          },
         });
         if (id) {
           await updateStatus({ channelId: id, status: "READ" });
         }
-      } else if (reciever.username === user?.user?.username) {
-        toast("New message from " + sender.username);
+        dispatch(clearMessagesFrom({ username: sender.username }));
       }
     };
 
@@ -132,7 +144,7 @@ const Index = () => {
     return () => {
       socket.off("private_message", handler);
     };
-  }, [user?.user?.username, name, id, updateStatus]);
+  }, [user?.user?.username, name, id, updateStatus, dispatch]);
 
   useEffect(() => {
     if (arrivalMessage) {
@@ -305,6 +317,8 @@ const ChatBubble = styled.div<IProps>`
     props.fromSelf ? "var(--primary--color-400)" : "var(--dark--color-750)"};
   color: white;
   border-radius: 1.25em;
-  border-bottom-right-radius: ${(props) => (props.fromSelf ? "0.35em" : "1.25em")};
-  border-bottom-left-radius: ${(props) => (props.fromSelf ? "1.25em" : "0.35em")};
+  border-bottom-right-radius: ${(props) =>
+    props.fromSelf ? "0.35em" : "1.25em"};
+  border-bottom-left-radius: ${(props) =>
+    props.fromSelf ? "1.25em" : "0.35em"};
 `;
