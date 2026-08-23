@@ -52,14 +52,20 @@ const Index = () => {
 
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!input.trim() || !id) return;
 
-    const reciever = conversations?.conversation.filter((u: any) => {
-      return u._id === id;
-    });
+    const channel = conversations?.conversation?.find((u: any) => u._id === id);
+    if (!channel) {
+      toast.error("Conversation not found");
+      return;
+    }
 
-    const receiverInfo = reciever[0].users.filter((u: any) => {
-      return u._id !== user.user?.userId;
-    });
+    const receiverInfo = channel.users.filter(
+      (u: any) => u._id !== user.user?.userId
+    );
+    if (!receiverInfo[0]) return;
+
+    const text = input.trim();
 
     socket.emit("private_message", {
       sender: { username: user?.user?.username, userId: user?.user?.userId },
@@ -67,55 +73,77 @@ const Index = () => {
         username: receiverInfo[0].username,
         userId: receiverInfo[0]._id,
       },
-      message: input,
+      message: text,
     });
 
     const msg = {
       status: "DELIVERED",
-      content: input,
+      content: text,
       sender: user.user?.userId,
     };
 
     const newmsg = {
       status: "DELIVERED",
-      content: input,
+      content: text,
       sender: { _id: user.user?.userId, username: user.user?.username },
     };
 
-    await sendMessage({ msg, conversationId: id });
-    setMessages((prev) => [...prev, newmsg]);
+    try {
+      await sendMessage({ msg, conversationId: id });
+      setMessages((prev) => [...prev, newmsg]);
+      setInput("");
+    } catch {
+      toast.error("Could not send message");
+    }
   };
 
   const handleEmoji = (emoji: EmojiClickData) => {
-    setInput(input + emoji.emoji);
+    setInput((prev) => prev + emoji.emoji);
   };
 
   useEffect(() => {
-    socket.on("private_message", async ({ sender, reciever, message }) => {
+    const handler = async ({
+      sender,
+      reciever,
+      message,
+    }: {
+      sender: { _id?: string; username: string };
+      reciever: { username: string };
+      message: string;
+    }) => {
       if (
-        reciever.username == user?.user?.username &&
+        reciever.username === user?.user?.username &&
         sender.username === name
       ) {
-        setArrivalMessage({ status: "DELIVERED", content: message, sender });
-        if (window.location.pathname.includes("/chat")) {
-          //  Get rid of this here add on page opened
+        setArrivalMessage({
+          status: "DELIVERED",
+          content: message,
+          sender: { _id: sender._id, username: sender.username },
+        });
+        if (id) {
           await updateStatus({ channelId: id, status: "READ" });
-          // console.log("RECIEVED " + sender.username);
-        } else if (!window.location.pathname.includes("/chat")) {
-          toast("New Message from " + sender.username);
         }
+      } else if (reciever.username === user?.user?.username) {
+        toast("New message from " + sender.username);
       }
-    });
-  }, []);
+    };
+
+    socket.on("private_message", handler);
+    return () => {
+      socket.off("private_message", handler);
+    };
+  }, [user?.user?.username, name, id, updateStatus]);
 
   useEffect(() => {
-    arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
+    if (arrivalMessage) {
+      setMessages((prev) => [...prev, arrivalMessage]);
+    }
   }, [arrivalMessage]);
 
   useEffect(() => {
     refetch();
     socketConnect(user);
-    recieverRef.current?.focus;
+    recieverRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -123,7 +151,7 @@ const Index = () => {
   }, [messages]);
 
   return (
-    <div style={{ flex: "1", display: "flex", gap: "1em", overflow: "hidden" }}>
+    <ChatLayout>
       <PageContainer style={{ display: "flex", flexDirection: "column" }}>
         <PageTitle
           style={{ display: "flex", alignItems: "center", gap: "1em" }}
@@ -132,144 +160,80 @@ const Index = () => {
           <h1>{name}</h1>
         </PageTitle>
 
-        <div style={{ flex: "1", overflow: "hidden", position: "relative" }}>
-          <div
-            style={{
-              height: "90%",
-              overflowY: "scroll",
-              padding: "1em",
-              width: "100%",
-            }}
-          >
-            <div style={{ width: "100%", height: "100%" }}>
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
+        <ChatBody>
+          <MessageList>
+            {messages?.map((m, index) => (
+              <ChatBubble
+                key={`${m.content}-${index}`}
+                fromSelf={m?.sender?._id == user.user?.userId}
+                ref={index === messages.length - 1 ? scrollRef : undefined}
               >
-                {messages &&
-                  messages?.map((m) => (
-                    <ChatBubble
-                      fromSelf={m?.sender?._id == user.user?.userId}
-                      ref={scrollRef}
-                    >
-                      <p>{m.content}</p>
-                    </ChatBubble>
-                  ))}
-              </div>
+                <p>{m.content}</p>
+              </ChatBubble>
+            ))}
+          </MessageList>
 
-              <MessageInputContainer>
-                <Form onSubmit={handleSendMessage}>
-                  <Input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Text Message"
-                    ref={recieverRef}
-                  />
-                  <span onClick={() => setOpenEmoji(!openEmoji)}>
-                    <BsEmojiSmile />
-                  </span>
-                  <Button label="Send" isLoading={false} color={false} />
-                </Form>
-              </MessageInputContainer>
-              {openEmoji && (
-                <EmojiContainer>
-                  <EmojiPicker
-                    onEmojiClick={(emoji: EmojiClickData) => handleEmoji(emoji)}
-                  />
-                </EmojiContainer>
-              )}
-            </div>
-          </div>
-        </div>
+          <MessageInputContainer>
+            <Form onSubmit={handleSendMessage}>
+              <Input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Text message"
+                ref={recieverRef}
+              />
+              <span onClick={() => setOpenEmoji(!openEmoji)}>
+                <BsEmojiSmile />
+              </span>
+              <Button label="Send" isLoading={false} color={true} />
+            </Form>
+          </MessageInputContainer>
+
+          {openEmoji && (
+            <EmojiContainer>
+              <EmojiPicker onEmojiClick={handleEmoji} />
+            </EmojiContainer>
+          )}
+        </ChatBody>
       </PageContainer>
 
       <SideContent>
-        <div style={{ height: "40px", marginBottom: "1em" }}>
-          <h3>Trending</h3>
-        </div>
-
+        <SideHeading>Chat</SideHeading>
         <SideFriendContainer>
-          <h3>Friends</h3>
-
-          <SideFriendInner>
-            <p>Followers</p>
-            {/* {currentUserData
-              ? currentUserData.user.followers.map((follower: any) => (
-                  <div
-                    style={{
-                      padding: "1em",
-                      backgroundColor: "var(--dark--color-900)",
-                      marginTop: ".5em",
-                      cursor: "pointer",
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                    onClick={() =>
-                      setReciepient({
-                        userId: follower._id,
-                        username: follower.username,
-                      })
-                    }
-                  >
-                    <p>{follower.username}</p>
-                    <p>new</p>
-                  </div>
-                ))
-              : null} */}
-          </SideFriendInner>
-
-          <SideFriendInner>
-            <p>Followings</p>
-            {/* {currentUserData
-              ? currentUserData.user.followings.map((follower: any) => (
-                  <div
-                    style={{
-                      padding: "1em",
-                      backgroundColor: "var(--dark--color-900)",
-                      marginTop: ".5em",
-                      cursor: "pointer",
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                    onClick={() =>
-                      setReciepient({
-                        userId: follower._id,
-                        username: follower.username,
-                      })
-                    }
-                  >
-                    <p>{follower.username}</p>
-                    <p>new</p>
-                  </div>
-                ))
-              : null} */}
-          </SideFriendInner>
+          <p style={{ color: "var(--txt--muted)", fontSize: "0.9rem" }}>
+            Messaging @{name}
+          </p>
         </SideFriendContainer>
       </SideContent>
-    </div>
+    </ChatLayout>
   );
 };
 
 export default Index;
 
-export const InputContainer = styled.div`
+const ChatLayout = styled.div`
+  flex: 1;
   display: flex;
-  align-items: center;
+  gap: 1em;
+  overflow: hidden;
+  min-width: 0;
+`;
 
-  p {
-    font-size: 1rem;
-  }
+const ChatBody = styled.div`
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+`;
 
-  span {
-    display: flex;
-    align-items: center;
-    font-size: 1.2rem;
-  }
+const MessageList = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Input = styled.input`
@@ -277,40 +241,35 @@ const Input = styled.input`
   outline: none;
   background-color: transparent;
   flex: 1;
-  color: white;
+  color: var(--txt--color-100);
   padding: 0 0.5em;
   font-size: 1rem;
 `;
 
 const MessageInputContainer = styled.div`
-  position: absolute;
-  bottom: 1em;
-  left: 0;
-  right: 0;
   width: 100%;
-  height: 35px;
-  padding: 0 1em;
+  min-height: 40px;
+  padding: 0.35em 1em;
   display: flex;
   align-items: center;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background-color: var(--dark--color-800);
+  border: 1px solid var(--border-subtle);
+  margin: 0 0 0.5em;
 `;
 
 const Form = styled.form`
-  /* width: 100%; */
   display: flex;
   align-items: center;
   flex: 1;
+  gap: 0.35em;
 
   span {
     display: flex;
     align-items: center;
-    margin-inline: 0.5em;
-    font-size: 1.3rem;
-  }
-
-  input {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: var(--light--color-400);
   }
 `;
 
@@ -319,20 +278,17 @@ const EmojiContainer = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  z-index: 20;
 `;
 
-const SideFriendContainer = styled.div``;
+const SideFriendContainer = styled.div`
+  margin-top: 0.5em;
+`;
 
-const SideFriendInner = styled.div`
-  margin-top: 1em;
-
-  div {
-    border-radius: 10px;
-  }
-
-  p {
-    font-weight: 600;
-  }
+const SideHeading = styled.h3`
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5em;
 `;
 
 interface IProps {
@@ -340,20 +296,15 @@ interface IProps {
 }
 
 const ChatBubble = styled.div<IProps>`
-  max-width: 40%;
+  max-width: 70%;
   word-wrap: break-word;
-  padding: 0.5em 1em;
-  margin-top: 0.5em;
-  align-self: ${(props) => (props.fromSelf ? "flex-start" : "flex-end")};
+  padding: 0.55em 1em;
+  margin-top: 0.45em;
+  align-self: ${(props) => (props.fromSelf ? "flex-end" : "flex-start")};
   background: ${(props) =>
-    props.fromSelf ? "var(--primary--color-300)" : "var(--primary--color-400)"};
+    props.fromSelf ? "var(--primary--color-400)" : "var(--dark--color-750)"};
   color: white;
-  border-bottom-left-radius: ${(props) => (props.fromSelf ? "" : "")};
-  border-top-left-radius: ${(props) => (props.fromSelf ? "1.5em" : "1.5em")};
-  border-bottom-right-radius: ${(props) => (props.fromSelf ? "1.5em" : "")};
-  border-top-right-radius: ${(props) => (props.fromSelf ? "1.5em" : "")};
-
-  border-bottom-right-radius: ${(props) => (props.fromSelf ? "" : "")};
-  border-bottom-left-radius: ${(props) => (props.fromSelf ? "" : "1.5em")};
-  border-top-right-radius: ${(props) => (props.fromSelf ? "" : "1.5em")};
+  border-radius: 1.25em;
+  border-bottom-right-radius: ${(props) => (props.fromSelf ? "0.35em" : "1.25em")};
+  border-bottom-left-radius: ${(props) => (props.fromSelf ? "1.25em" : "0.35em")};
 `;
