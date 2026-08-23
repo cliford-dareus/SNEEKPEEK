@@ -10,7 +10,6 @@ const addNewMessage = async (req: Request, res: Response) => {
 
     const conversation = await Messages.findOne({ channelId: id });
     const channel = await Conversation.findOne({ _id: id });
-    console.log(channel);
 
     if (!channel) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -39,12 +38,12 @@ const addNewMessage = async (req: Request, res: Response) => {
     channel.lastmessage = msg.content;
     await channel.save();
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       conversation: newConversation,
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
@@ -59,12 +58,12 @@ const getAllMessage = async (req: Request, res: Response) => {
       .populate("messages.sender", ["_id", "username"])
       .populate("channelId");
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       message,
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
@@ -81,11 +80,11 @@ const updateMessageStatus = async (req: Request, res: Response) => {
       { arrayFilters: [{ "elem.status": "DELIVERED" }] }
     );
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       status: StatusCodes.BAD_REQUEST,
       message: ReasonPhrases.BAD_REQUEST,
     });
