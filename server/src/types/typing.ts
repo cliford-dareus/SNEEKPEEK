@@ -9,13 +9,7 @@ export interface IConversation {
 
 export interface IMessage {
   channelId: ObjectId;
-  messages: { status: status; content: string; sender: ObjectId }[];
-}
-
-export enum status {
-  READ,
-  RECIEVED,
-  DELIVERED,
+  messages: { status: string; content: string; sender: ObjectId }[];
 }
 
 // @USER
@@ -91,16 +85,18 @@ export interface IAccessToken {
 }
 
 // @NOTIFICATION
+export type NotificationType =
+  | "REQUEST"
+  | "FOLLOW"
+  | "TAG"
+  | "LIKE"
+  | "COMMENT"
+  | "GENERAL";
+
 export interface INotification {
   sender: ObjectId;
   target: ObjectId;
-  type: TYPE;
-  status: status;
-}
-
-enum TYPE {
-  FOLLOW,
-  TAG,
-  LIKE,
-  COMMENT,
+  type: NotificationType;
+  message?: string;
+  status: "RECEIVED" | "READ";
 }
