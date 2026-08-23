@@ -10,6 +10,40 @@ export const Icon = styled.span`
   cursor: pointer;
   color: var(--light--color-400);
   transition: color 0.15s ease;
+  position: relative;
+
+  &:hover {
+    color: var(--primary--color-400);
+  }
+`;
+
+export const IconBadge = styled.span`
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
+  background: var(--danger);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  pointer-events: none;
+`;
+
+export const IconLink = styled(Link)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1rem;
+  color: var(--light--color-400);
+  position: relative;
+  transition: color 0.15s ease;
 
   &:hover {
     color: var(--primary--color-400);
@@ -84,7 +118,7 @@ export const HeaderInput = styled.input`
 export const HeaderActions = styled.div`
   display: flex;
   align-items: center;
-  gap: 1em;
+  gap: 1.15em;
 `;
 
 export const HeaderProfileContainer = styled.div`
@@ -158,4 +192,58 @@ export const HeaderProfileModal = styled(motion.div)`
       font-weight: 500;
     }
   }
+`;
+
+export const InboxDropdown = styled.div`
+  position: absolute;
+  top: calc(100% + 0.65em);
+  right: 0;
+  width: min(300px, 90vw);
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 0.5em;
+  border-radius: var(--radius-md);
+  background-color: var(--dark--color-800);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-md);
+  z-index: 999999;
+`;
+
+export const InboxItem = styled(Link)`
+  display: block;
+  padding: 0.65em 0.75em;
+  border-radius: var(--radius-sm);
+  color: var(--txt--color-100);
+
+  &:hover {
+    background: var(--dark--color-750);
+  }
+
+  strong {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--primary--color-400);
+  }
+
+  span {
+    font-size: 0.8rem;
+    color: var(--txt--muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+`;
+
+export const InboxEmpty = styled.p`
+  padding: 1em 0.75em;
+  font-size: 0.85rem;
+  color: var(--txt--muted);
+  text-align: center;
+`;
+
+export const IconWrap = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
 `;
